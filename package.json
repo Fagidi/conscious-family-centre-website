@@ -1,0 +1,36 @@
+{
+  "name": "sarai-photo-booth",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sarai Photo Booth — Luxury photo booth & event experiences, Long Island, New York.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^4.22.0",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.23",
+    "next": "^15.5.19",
+    "next-sanity": "^11.6.13",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "sanity": "^4.22.0",
+    "styled-components": "^6.4.2",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.1",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
+  }
+}

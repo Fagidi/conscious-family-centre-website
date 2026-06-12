@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<!--
+  Netlify Forms detection file.
+  Netlify's build bots parse this static HTML to register the
+  "booking-inquiry" form; the React form posts here at runtime.
+-->
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Forms</title></head>
+  <body>
+    <form name="booking-inquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <input type="date" name="eventDate" />
+      <select name="eventType"></select>
+      <input type="text" name="venue" />
+      <textarea name="message"></textarea>
+      <input name="bot-field" />
+    </form>
+  </body>
+</html>
