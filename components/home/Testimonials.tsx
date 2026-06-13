@@ -9,7 +9,7 @@ import type { Testimonial } from "@/lib/types";
  * One large editorial quote at a time, crossfading on a slow cadence
  * with manual control — restraint over carousel theatrics.
  */
-export default function Testimonials({ items }: { items: Testimonial[] }) {
+export default function Testimonials({ items, eyebrow }: { items: Testimonial[]; eyebrow: string }) {
   const [index, setIndex] = useState(0);
   const quoteRef = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -49,7 +49,7 @@ export default function Testimonials({ items }: { items: Testimonial[] }) {
         <Reveal>
           <p className="eyebrow mb-14 flex items-center gap-4 justify-center">
             <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-            In Their Words
+            {eyebrow}
             <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
           </p>
         </Reveal>

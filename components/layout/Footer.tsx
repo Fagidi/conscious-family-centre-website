@@ -25,7 +25,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
             </Reveal>
             <TextReveal
               as="p"
-              lines={["Begin the", "conversation."]}
+              lines={settings.footerInvitationLines}
               className="font-display text-display-lg font-light"
             />
           </div>

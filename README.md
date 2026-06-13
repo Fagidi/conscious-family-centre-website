@@ -52,11 +52,29 @@ public/__forms.html       Netlify Forms detection file
 ## Content & CMS
 
 Pages read everything through `lib/data.ts`. If Sanity is configured and a
-document is published, **Sanity wins**; otherwise the curated defaults in
-`lib/content.ts` render. The site is fully deployable before the CMS is touched.
+document is published, **Sanity wins field-by-field**; missing documents and
+missing fields both resolve to the curated defaults in `lib/content.ts`, so a
+half-finished document can never blank out a section. Pages revalidate every
+60 seconds — published edits go live without a redeploy.
 
-Editable in Studio: hero content (per page), services, testimonials, gallery,
-FAQ, contact information, site settings, SEO settings.
+Every piece of page content is editable in Studio:
+
+| Studio section | Schema | Covers |
+| --- | --- | --- |
+| Pages → Home | `homePage` | manifesto, stats, section headings, page SEO |
+| Pages → About | `aboutPage` | story, standards/pillars, closing, page SEO |
+| Pages → Services | `servicesPage` | process steps + heading, page SEO |
+| Pages → FAQ | `faqPage` | side note card, page SEO |
+| Pages → Contact | `contactInfo` | headline, copy, image, event types, page SEO |
+| Hero Content | `hero` | one hero per page (home / about / services / faq) |
+| Services | `service` | the five experience articles |
+| Testimonials | `testimonial` | quotes |
+| Gallery | `galleryImage` | film-strip imagery |
+| FAQ | `faqItem` | questions, grouped by category |
+| Closing CTA | `ctaSection` | shared full-bleed invitation on every page |
+| Site Settings | `siteSettings` | contact details, announcement, footer headline |
+| SEO Settings | `seoSettings` | global meta defaults, OG image, keywords |
+
 Layout, animation, components, and the design system stay in code.
 
 ### Connect Sanity
@@ -65,6 +83,19 @@ Layout, animation, components, and the design system stay in code.
 2. Copy `.env.example` → `.env.local` and set `NEXT_PUBLIC_SANITY_PROJECT_ID`.
 3. Add `http://localhost:3000` (and your production domain) to the project's CORS origins.
 4. Visit `/studio`, sign in, and publish content.
+
+### Seed the launch content
+
+To start editors from the live copy instead of empty documents, create a token
+with **Editor** rights (sanity.io/manage → API → Tokens), add it to `.env.local`
+as `SANITY_WRITE_TOKEN`, then run:
+
+```bash
+npm run seed
+```
+
+The script is idempotent (stable document IDs, create-or-replace) and uploads
+the placeholder imagery to Sanity's CDN as real image assets.
 
 ## Development
 

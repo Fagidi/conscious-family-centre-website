@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 import Image from "@/components/ui/CineImage";
 import { getContactContent, getSiteSettings } from "@/lib/data";
-import { pageSeo } from "@/lib/content";
 import ContactForm from "@/components/contact/ContactForm";
 import Reveal from "@/components/animation/Reveal";
 import TextReveal from "@/components/animation/TextReveal";
 import ImageReveal from "@/components/animation/ImageReveal";
 import Parallax from "@/components/animation/Parallax";
 
-export const metadata: Metadata = {
-  title: pageSeo.contact.title,
-  description: pageSeo.contact.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getContactContent();
+  return { title: { absolute: seo.title }, description: seo.description };
+}
 
 export default async function ContactPage() {
   const [content, settings] = await Promise.all([getContactContent(), getSiteSettings()]);

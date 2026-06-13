@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "@/components/ui/CineImage";
-import { getServices } from "@/lib/data";
-import { pageSeo, processSteps } from "@/lib/content";
+import { getHero, getServices, getServicesPage } from "@/lib/data";
 import PageHero from "@/components/shared/PageHero";
 import CtaSection from "@/components/shared/CtaSection";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -10,20 +9,24 @@ import ImageReveal from "@/components/animation/ImageReveal";
 import Parallax from "@/components/animation/Parallax";
 import Button from "@/components/ui/Button";
 
-export const metadata: Metadata = {
-  title: pageSeo.services.title,
-  description: pageSeo.services.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getServicesPage();
+  return { title: { absolute: seo.title }, description: seo.description };
+}
 
 export default async function ServicesPage() {
-  const services = await getServices();
+  const [hero, page, services] = await Promise.all([
+    getHero("services"),
+    getServicesPage(),
+    getServices(),
+  ]);
 
   return (
     <>
       <PageHero
-        eyebrow="The Experiences"
-        titleLines={["Designed for rooms", "where details matter."]}
-        intro="Five experiences, one standard. Each is designed to your event — its palette, its light, its people — and run by a team that treats hospitality as part of the photograph."
+        eyebrow={hero.eyebrow}
+        titleLines={hero.titleLines}
+        intro={hero.subtitle}
       />
 
       {/* Index */}
@@ -111,12 +114,12 @@ export default async function ServicesPage() {
       <section className="bg-noir py-28 md:py-40">
         <div className="container-site">
           <SectionHeading
-            eyebrow="How It Works"
-            lines={["From first call", "to final keepsake."]}
+            eyebrow={page.processSection.eyebrow}
+            lines={page.processSection.titleLines}
             className="mb-20"
           />
           <div className="grid grid-cols-1 gap-px bg-noir-line md:grid-cols-2 lg:grid-cols-4">
-            {processSteps.map((step, i) => (
+            {page.processSteps.map((step, i) => (
               <Reveal key={step.number} delay={i * 0.1} className="bg-noir">
                 <div className="group h-full p-9 transition-colors duration-700 ease-luxe hover:bg-noir-raise md:p-10">
                   <p className="font-display text-5xl font-light text-noir-line transition-colors duration-700 group-hover:text-amethyst">

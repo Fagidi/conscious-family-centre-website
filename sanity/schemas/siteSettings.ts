@@ -14,6 +14,14 @@ export const siteSettings = defineType({
     defineField({ name: "instagram", title: "Instagram URL", type: "url" }),
     defineField({ name: "bookingCtaLabel", title: "Booking CTA Label", type: "string", initialValue: "Reserve Your Date" }),
     defineField({ name: "announcement", title: "Announcement Bar Text", type: "string" }),
+    defineField({
+      name: "footerInvitationLines",
+      title: "Footer Invitation Headline",
+      description: "Each entry renders as its own line, e.g. “Begin the” / “conversation.”",
+      type: "array",
+      of: [{ type: "string" }],
+      validation: (rule) => rule.max(3),
+    }),
   ],
   preview: { prepare: () => ({ title: "Site Settings" }) },
 });

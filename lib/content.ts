@@ -6,9 +6,12 @@ import type {
   Testimonial,
   GalleryImage,
   FaqItem,
-  ProcessStep,
-  ValuePillar,
-  Stat,
+  HomePageContent,
+  AboutPageContent,
+  ServicesPageContent,
+  FaqPageContent,
+  ContactContent,
+  CtaContent,
 } from "./types";
 
 /**
@@ -16,8 +19,11 @@ import type {
  *
  * This is the launch copy for the entire site. Every field here can be
  * overridden from Sanity Studio — when a matching document is published,
- * Sanity wins; otherwise this content renders. The site is therefore
- * fully deployable before the CMS is ever touched.
+ * Sanity wins field-by-field; otherwise this content renders. The site
+ * is therefore fully deployable before the CMS is ever touched.
+ *
+ * `scripts/seed.ts` pushes this exact content into the Sanity dataset
+ * so editors start from the live copy instead of empty documents.
  */
 
 const u = (id: string, w = 2400) =>
@@ -35,6 +41,7 @@ export const siteSettings: SiteSettings = {
   instagram: "https://instagram.com/saraiphotobooth",
   bookingCtaLabel: "Reserve Your Date",
   announcement: "Now booking 2026 & 2027 weddings",
+  footerInvitationLines: ["Begin the", "conversation."],
 };
 
 export const seoSettings: SeoSettings = {
@@ -50,37 +57,73 @@ export const seoSettings: SeoSettings = {
   ],
 };
 
-/* ────────────────────────── Home ────────────────────────── */
+/* ────────────────────────── Page heroes ────────────────────────── */
 
-export const homeHero: HeroContent = {
-  eyebrow: "Luxury Photo Booth & Event Experiences — Long Island, New York",
-  titleLines: ["Some moments", "deserve forever."],
-  subtitle:
-    "Sarai designs photographic experiences for weddings, corporate events, and celebrations where every detail matters — including this one.",
-  ctaLabel: "Reserve Your Date",
-  ctaHref: "/contact",
-  secondaryCtaLabel: "Explore the Experience",
-  secondaryCtaHref: "/services",
-  image: u("photo-1519741497674-611481863552"),
-  imageAlt: "Bride and groom in cinematic evening light at a luxury wedding",
+export const heroes: Record<"home" | "about" | "services" | "faq", HeroContent> = {
+  home: {
+    eyebrow: "Luxury Photo Booth & Event Experiences — Long Island, New York",
+    titleLines: ["Some moments", "deserve forever."],
+    subtitle:
+      "Sarai designs photographic experiences for weddings, corporate events, and celebrations where every detail matters — including this one.",
+    ctaLabel: "Reserve Your Date",
+    ctaHref: "/contact",
+    secondaryCtaLabel: "Explore the Experience",
+    secondaryCtaHref: "/services",
+    image: u("photo-1519741497674-611481863552"),
+    imageAlt: "Bride and groom in cinematic evening light at a luxury wedding",
+  },
+  about: {
+    eyebrow: "About Sarai",
+    titleLines: ["Built on a simple belief:", "memory is a luxury."],
+    image: u("photo-1511795409834-ef04bbd61622"),
+    imageAlt: "Guests gathered around an elegant candlelit dinner table",
+  },
+  services: {
+    eyebrow: "The Experiences",
+    titleLines: ["Designed for rooms", "where details matter."],
+    subtitle:
+      "Five experiences, one standard. Each is designed to your event — its palette, its light, its people — and run by a team that treats hospitality as part of the photograph.",
+  },
+  faq: {
+    eyebrow: "Questions, Answered",
+    titleLines: ["Everything you'd ask", "over a glass of champagne."],
+    subtitle:
+      "The details behind booking, logistics, and the experience itself. If your question isn't here, we're one note away.",
+  },
 };
 
-export const homeManifesto = {
-  eyebrow: "The Sarai Standard",
-  lines: [
-    "A photo booth is equipment.",
-    "An experience is a memory.",
-    "We only build the second kind.",
+/* ────────────────────────── Home page ────────────────────────── */
+
+export const homePage: HomePageContent = {
+  manifesto: {
+    eyebrow: "The Sarai Standard",
+    lines: [
+      "A photo booth is equipment.",
+      "An experience is a memory.",
+      "We only build the second kind.",
+    ],
+    body: "Every Sarai installation is designed like a moment of the event itself — considered lighting, curated backdrops, attendants in black tie, and prints your guests will keep for decades. Nothing inflatable. Nothing ordinary.",
+  },
+  stats: [
+    { value: "350+", label: "Events captured" },
+    { value: "120K", label: "Moments delivered" },
+    { value: "5.0", label: "Average client rating" },
+    { value: "48hrs", label: "Gallery turnaround" },
   ],
-  body: "Every Sarai installation is designed like a moment of the event itself — considered lighting, curated backdrops, attendants in black tie, and prints your guests will keep for decades. Nothing inflatable. Nothing ordinary.",
+  servicesSection: {
+    eyebrow: "The Experiences",
+    titleLines: ["Five ways to make", "an evening unforgettable."],
+  },
+  gallerySection: {
+    eyebrow: "From Recent Evenings",
+    title: "The work, unposed.",
+  },
+  testimonialsEyebrow: "In Their Words",
+  seo: {
+    title: "Sarai Photo Booth — Luxury Photo Booth & Event Experiences | Long Island, NY",
+    description: seoSettings.metaDescription,
+  },
 };
-
-export const homeStats: Stat[] = [
-  { value: "350+", label: "Events captured" },
-  { value: "120K", label: "Moments delivered" },
-  { value: "5.0", label: "Average client rating" },
-  { value: "48hrs", label: "Gallery turnaround" },
-];
 
 export const galleryImages: GalleryImage[] = [
   { src: u("photo-1519225421980-715cb0215aed", 1600), alt: "First dance under string lights at an estate wedding" },
@@ -215,45 +258,50 @@ export const services: Service[] = [
   },
 ];
 
-export const processSteps: ProcessStep[] = [
-  {
-    number: "01",
-    title: "The Conversation",
-    description:
-      "A short call about your event, your venue, and what you want guests to feel. We hold your date for seven days while we design.",
+export const servicesPage: ServicesPageContent = {
+  processSection: {
+    eyebrow: "How It Works",
+    titleLines: ["From first call", "to final keepsake."],
   },
-  {
-    number: "02",
-    title: "The Design",
+  processSteps: [
+    {
+      number: "01",
+      title: "The Conversation",
+      description:
+        "A short call about your event, your venue, and what you want guests to feel. We hold your date for seven days while we design.",
+    },
+    {
+      number: "02",
+      title: "The Design",
+      description:
+        "We compose the experience — booth styling, backdrop, lighting, and print suite — and present it as a visual proposal alongside your planner.",
+    },
+    {
+      number: "03",
+      title: "The Evening",
+      description:
+        "Our team arrives hours early, builds quietly, and runs the experience in black tie. You never think about us once. That's the point.",
+    },
+    {
+      number: "04",
+      title: "The Keepsake",
+      description:
+        "Within 48 hours, your complete gallery arrives — retouched, organized, and ready to relive. Heirloom print boxes follow by courier.",
+    },
+  ],
+  seo: {
+    title: "Services — Luxury Photo Booth Rentals, 360 Experiences & More",
     description:
-      "We compose the experience — booth styling, backdrop, lighting, and print suite — and present it as a visual proposal alongside your planner.",
+      "Signature photo booth rentals, cinematic 360 experiences, weddings, corporate activations, and private celebrations across Long Island, the Hamptons, and NYC.",
   },
-  {
-    number: "03",
-    title: "The Evening",
-    description:
-      "Our team arrives hours early, builds quietly, and runs the experience in black tie. You never think about us once. That's the point.",
-  },
-  {
-    number: "04",
-    title: "The Keepsake",
-    description:
-      "Within 48 hours, your complete gallery arrives — retouched, organized, and ready to relive. Heirloom print boxes follow by courier.",
-  },
-];
+};
 
-/* ────────────────────────── About ────────────────────────── */
+/* ────────────────────────── About page ────────────────────────── */
 
-export const aboutContent = {
-  hero: {
-    eyebrow: "About Sarai",
-    titleLines: ["Built on a simple belief:", "memory is a luxury."],
-    image: u("photo-1511795409834-ef04bbd61622"),
-    imageAlt: "Guests gathered around an elegant candlelit dinner table",
-  },
+export const aboutPage: AboutPageContent = {
   story: {
     eyebrow: "Our Story",
-    title: "From one Long Island wedding to three hundred and fifty.",
+    titleLines: ["From one Long Island", "wedding to three", "hundred and fifty."],
     paragraphs: [
       "Sarai began the way the best things do — at a wedding. Watching guests crowd around a tired, fluorescent-lit booth in the corner of an otherwise breathtaking room, our founder asked a question no one in the industry seemed to be asking: why is the most-visited corner of the event the least designed?",
       "We spent a year answering it. Studio lighting instead of ring lights. Archival prints instead of glossy strips. Attendants who dress like guests, not staff. Backdrops composed with the florist, not shipped from a warehouse. The result was a photographic experience that belonged in the rooms it stood in — and Long Island's planners noticed.",
@@ -263,6 +311,10 @@ export const aboutContent = {
     imageAlt: "Champagne toast between guests at a refined celebration",
     secondImage: u("photo-1519167758481-83f550bb49b3"),
     secondImageAlt: "A grand ballroom dressed for a luxury wedding",
+  },
+  pillarsSection: {
+    eyebrow: "What We Believe",
+    titleLines: ["Standards that don't", "scale down."],
   },
   pillars: [
     {
@@ -285,11 +337,16 @@ export const aboutContent = {
       description:
         "Load-in schedules to the minute, COIs before they're requested, backups for the backups. Luxury is reliability.",
     },
-  ] as ValuePillar[],
+  ],
   closing: {
     eyebrow: "The People",
-    title: "A small team with impossible standards.",
+    titleLines: ["A small team with", "impossible standards."],
     body: "Sarai is run by a tight ensemble of photographers, designers, and event professionals who have worked the most demanding rooms in New York. We take a limited number of events each season — when we're at your event, we are entirely at your event.",
+  },
+  seo: {
+    title: "About — Sarai Photo Booth",
+    description:
+      "The story and standards behind Long Island's luxury photo booth house. Design before equipment, hospitality before staffing, heirlooms before output.",
   },
 };
 
@@ -370,38 +427,22 @@ export const faqItems: FaqItem[] = [
   },
 ];
 
-/* ────────────────────────── Page-level SEO ────────────────────────── */
-
-export const pageSeo = {
-  home: {
-    title: "Sarai Photo Booth — Luxury Photo Booth & Event Experiences | Long Island, NY",
-    description: seoSettings.metaDescription,
+export const faqPage: FaqPageContent = {
+  sideNote: {
+    eyebrow: "Still Curious?",
+    title: "Ask us anything — we answer within one business day.",
+    ctaLabel: "Start the Conversation",
   },
-  about: {
-    title: "About — Sarai Photo Booth",
-    description:
-      "The story and standards behind Long Island's luxury photo booth house. Design before equipment, hospitality before staffing, heirlooms before output.",
-  },
-  services: {
-    title: "Services — Luxury Photo Booth Rentals, 360 Experiences & More",
-    description:
-      "Signature photo booth rentals, cinematic 360 experiences, weddings, corporate activations, and private celebrations across Long Island, the Hamptons, and NYC.",
-  },
-  faq: {
+  seo: {
     title: "FAQ — Sarai Photo Booth",
     description:
       "Booking timelines, logistics, customization, insurance, and everything else you'd like to know before reserving your date with Sarai.",
-  },
-  contact: {
-    title: "Reserve Your Date — Sarai Photo Booth",
-    description:
-      "Tell us about your wedding, corporate event, or private celebration. We respond within one business day with availability and a tailored proposal.",
   },
 };
 
 /* ────────────────────────── Contact ────────────────────────── */
 
-export const contactContent = {
+export const contactContent: ContactContent = {
   eyebrow: "Reserve Your Date",
   titleLines: ["Let's design", "your evening."],
   body: "Tell us about your event — the date, the venue, the feeling you're after. We respond within one business day with availability and a tailored proposal.",
@@ -415,11 +456,16 @@ export const contactContent = {
     "Brand Activation",
     "Other",
   ],
+  seo: {
+    title: "Reserve Your Date — Sarai Photo Booth",
+    description:
+      "Tell us about your wedding, corporate event, or private celebration. We respond within one business day with availability and a tailored proposal.",
+  },
 };
 
 /* ────────────────────────── Shared CTA ────────────────────────── */
 
-export const ctaSection = {
+export const ctaSection: CtaContent = {
   eyebrow: "Limited dates each season",
   titleLines: ["Your guests will remember", "how it felt."],
   body: "We accept a limited number of events each season to keep every installation at our standard. If your date matters, let's hold it.",

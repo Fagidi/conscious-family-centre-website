@@ -57,14 +57,16 @@ export default function Hero({ content }: { content: HeroContent }) {
     <section ref={ref} className="grain relative flex h-svh min-h-[640px] items-end overflow-hidden">
       {/* Cinematic backdrop */}
       <div data-hero-image className="absolute inset-0 will-change-transform">
-        <Image
-          src={content.image}
-          alt={content.imageAlt}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
+        {content.image && (
+          <Image
+            src={content.image}
+            alt={content.imageAlt ?? ""}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/45 to-noir/30" />
       <div className="absolute inset-0 bg-gradient-to-r from-noir/55 via-transparent to-transparent" />
@@ -92,7 +94,9 @@ export default function Hero({ content }: { content: HeroContent }) {
             {content.subtitle}
           </p>
           <div data-hero-meta className="flex flex-wrap items-center gap-5">
-            <Button href={content.ctaHref}>{content.ctaLabel}</Button>
+            {content.ctaLabel && content.ctaHref && (
+              <Button href={content.ctaHref}>{content.ctaLabel}</Button>
+            )}
             {content.secondaryCtaLabel && content.secondaryCtaHref && (
               <Button href={content.secondaryCtaHref} variant="ghost">
                 {content.secondaryCtaLabel}

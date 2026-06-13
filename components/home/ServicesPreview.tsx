@@ -5,20 +5,25 @@ import ImageReveal from "@/components/animation/ImageReveal";
 import Parallax from "@/components/animation/Parallax";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
-import type { Service } from "@/lib/types";
+import type { SectionHeadingContent, Service } from "@/lib/types";
+
+interface ServicesPreviewProps {
+  services: Service[];
+  heading: SectionHeadingContent;
+}
 
 /**
  * Editorial index of the five experiences — alternating image/text
  * rows with cinematic image reveals and quiet parallax.
  */
-export default function ServicesPreview({ services }: { services: Service[] }) {
+export default function ServicesPreview({ services, heading }: ServicesPreviewProps) {
   return (
     <section className="bg-noir-soft py-28 md:py-40">
       <div className="container-site">
         <div className="mb-20 flex flex-col justify-between gap-10 md:mb-28 md:flex-row md:items-end">
           <SectionHeading
-            eyebrow="The Experiences"
-            lines={["Five ways to make", "an evening unforgettable."]}
+            eyebrow={heading.eyebrow}
+            lines={heading.titleLines}
             headingClassName="font-display text-display-md font-light max-w-2xl"
           />
           <Reveal delay={0.2}>

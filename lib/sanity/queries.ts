@@ -8,10 +8,12 @@ import { groq } from "next-sanity";
  * resolved to direct CDN URLs in the query.
  */
 
+const seo = `seo{ "title": title, "description": description }`;
+
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings"][0]{
     siteName, tagline, phone, email, location, serviceArea,
-    instagram, bookingCtaLabel, announcement
+    instagram, bookingCtaLabel, announcement, footerInvitationLines
   }
 `;
 
@@ -29,6 +31,46 @@ export const heroQuery = groq`
     ctaLabel, ctaHref, secondaryCtaLabel, secondaryCtaHref,
     "image": image.asset->url,
     imageAlt
+  }
+`;
+
+export const homePageQuery = groq`
+  *[_type == "homePage"][0]{
+    manifesto{ eyebrow, lines, body },
+    stats[]{ value, label },
+    servicesSection{ eyebrow, titleLines },
+    gallerySection{ eyebrow, title },
+    testimonialsEyebrow,
+    ${seo}
+  }
+`;
+
+export const aboutPageQuery = groq`
+  *[_type == "aboutPage"][0]{
+    story{
+      eyebrow, titleLines, paragraphs,
+      "image": image.asset->url, imageAlt,
+      "secondImage": secondImage.asset->url, secondImageAlt
+    },
+    pillarsSection{ eyebrow, titleLines },
+    pillars[]{ title, description },
+    closing{ eyebrow, titleLines, body },
+    ${seo}
+  }
+`;
+
+export const servicesPageQuery = groq`
+  *[_type == "servicesPage"][0]{
+    processSection{ eyebrow, titleLines },
+    processSteps[]{ number, title, description },
+    ${seo}
+  }
+`;
+
+export const faqPageQuery = groq`
+  *[_type == "faqPage"][0]{
+    sideNote{ eyebrow, title, ctaLabel },
+    ${seo}
   }
 `;
 
@@ -64,6 +106,15 @@ export const contactInfoQuery = groq`
   *[_type == "contactInfo"][0]{
     eyebrow, titleLines, body,
     "image": image.asset->url,
-    imageAlt, eventTypes
+    imageAlt, eventTypes,
+    ${seo}
+  }
+`;
+
+export const ctaSectionQuery = groq`
+  *[_type == "ctaSection"][0]{
+    eyebrow, titleLines, body, ctaLabel, ctaHref,
+    "image": image.asset->url,
+    imageAlt
   }
 `;

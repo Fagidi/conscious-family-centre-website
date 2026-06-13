@@ -6,15 +6,20 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Reveal from "@/components/animation/Reveal";
-import type { GalleryImage } from "@/lib/types";
+import type { GalleryImage, HomePageContent } from "@/lib/types";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+interface GalleryStripProps {
+  images: GalleryImage[];
+  heading: HomePageContent["gallerySection"];
+}
 
 /**
  * A wide film-strip of event imagery that glides horizontally
  * against vertical scroll — the site's most cinematic moment.
  */
-export default function GalleryStrip({ images }: { images: GalleryImage[] }) {
+export default function GalleryStrip({ images, heading }: GalleryStripProps) {
   const ref = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -45,9 +50,9 @@ export default function GalleryStrip({ images }: { images: GalleryImage[] }) {
         <Reveal>
           <p className="eyebrow mb-5 flex items-center gap-4">
             <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-            From Recent Evenings
+            {heading.eyebrow}
           </p>
-          <h2 className="font-display text-display-md font-light">The work, unposed.</h2>
+          <h2 className="font-display text-display-md font-light">{heading.title}</h2>
         </Reveal>
       </div>
 

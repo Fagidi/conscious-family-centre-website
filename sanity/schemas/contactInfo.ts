@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { seoField } from "./fields";
 
 export const contactInfo = defineType({
   name: "contactInfo",
@@ -22,6 +23,7 @@ export const contactInfo = defineType({
       type: "array",
       of: [{ type: "string" }],
     }),
+    seoField,
   ],
   preview: { prepare: () => ({ title: "Contact Page" }) },
 });

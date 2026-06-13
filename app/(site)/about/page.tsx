@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "@/components/ui/CineImage";
-import { aboutContent, pageSeo } from "@/lib/content";
+import { getHero, getAboutPage } from "@/lib/data";
 import PageHero from "@/components/shared/PageHero";
 import CtaSection from "@/components/shared/CtaSection";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -9,13 +9,14 @@ import ImageReveal from "@/components/animation/ImageReveal";
 import Parallax from "@/components/animation/Parallax";
 import TextReveal from "@/components/animation/TextReveal";
 
-export const metadata: Metadata = {
-  title: pageSeo.about.title,
-  description: pageSeo.about.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getAboutPage();
+  return { title: { absolute: seo.title }, description: seo.description };
+}
 
-export default function AboutPage() {
-  const { hero, story, pillars, closing } = aboutContent;
+export default async function AboutPage() {
+  const [hero, page] = await Promise.all([getHero("about"), getAboutPage()]);
+  const { story, pillarsSection, pillars, closing } = page;
 
   return (
     <>
@@ -31,10 +32,7 @@ export default function AboutPage() {
         <div className="container-site">
           <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
             <div className="md:col-span-5">
-              <SectionHeading
-                eyebrow={story.eyebrow}
-                lines={["From one Long Island", "wedding to three", "hundred and fifty."]}
-              />
+              <SectionHeading eyebrow={story.eyebrow} lines={story.titleLines} />
             </div>
             <div className="space-y-8 md:col-span-5 md:col-start-8">
               <Reveal stagger={0.15}>
@@ -84,8 +82,8 @@ export default function AboutPage() {
       <section className="bg-noir-soft py-28 md:py-40">
         <div className="container-site">
           <SectionHeading
-            eyebrow="What We Believe"
-            lines={["Standards that don't", "scale down."]}
+            eyebrow={pillarsSection.eyebrow}
+            lines={pillarsSection.titleLines}
             className="mb-20"
           />
           <div className="grid grid-cols-1 gap-px bg-noir-line sm:grid-cols-2">
@@ -120,7 +118,7 @@ export default function AboutPage() {
           </Reveal>
           <TextReveal
             as="h2"
-            lines={["A small team with", "impossible standards."]}
+            lines={closing.titleLines}
             className="font-display text-display-md font-light"
           />
           <Reveal delay={0.2}>

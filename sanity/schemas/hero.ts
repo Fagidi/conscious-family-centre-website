@@ -16,7 +16,6 @@ export const hero = defineType({
           { title: "About", value: "about" },
           { title: "Services", value: "services" },
           { title: "FAQ", value: "faq" },
-          { title: "Contact", value: "contact" },
         ],
       },
       validation: (rule) => rule.required(),
