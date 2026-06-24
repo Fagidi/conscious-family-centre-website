@@ -76,8 +76,8 @@ export default function Header({ settings }: HeaderProps) {
                 </svg>
               </button>
 
-              {/* Book a Visit CTA */}
-              <div className="hidden xs:block">
+              {/* Book a Visit CTA — Desktop only */}
+              <div className="hidden md:block">
                 <Button href="/contact" size="sm" variant="primary">
                   Book a Visit
                 </Button>
@@ -89,13 +89,21 @@ export default function Header({ settings }: HeaderProps) {
                 onClick={() => setMenuOpen(true)}
                 aria-label="Open menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-2 h-10 px-3 md:h-auto md:px-0 rounded-lg md:rounded-none text-sm md:text-sm font-semibold text-forest-900 hover:text-leaf-600 active:bg-forest-900/10 md:active:bg-transparent transition-colors md:transition-colors"
+                className="flex items-center gap-2 h-10 px-2 md:h-auto md:px-0 rounded-lg md:rounded-none text-forest-900 hover:text-leaf-600 active:bg-forest-900/10 md:active:bg-transparent transition-colors"
               >
-                <span className="hidden sm:inline">Menu</span>
-                <span aria-hidden className="flex flex-col gap-[5px]">
-                  <span className="block h-0.5 w-5 rounded-full bg-current" />
-                  <span className="block h-0.5 w-5 rounded-full bg-current" />
-                </span>
+                <span className="hidden sm:inline text-sm font-semibold">Menu</span>
+                <svg
+                  aria-hidden
+                  className="w-6 h-6 md:w-5 md:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
             </div>
           </div>

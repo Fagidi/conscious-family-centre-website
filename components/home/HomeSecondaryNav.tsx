@@ -10,12 +10,17 @@ export interface SectionLink {
 }
 
 /**
- * Homepage-specific floating secondary navigation. Positioned to overlap the
- * hero-content boundary, appearing as a premium floating panel that bridges
- * sections. Animates in after scrolling past hero, stays sticky, animates
- * out when returning to top.
+ * Homepage-specific floating content navigator. DESKTOP ONLY.
  *
- * Renders ONLY on the homepage — not on other pages.
+ * Positioned in the lower portion of the viewport (like a sticky footer).
+ * Appears once user enters homepage content (scrolls past hero).
+ * Remains sticky and visible while content scrolls behind it.
+ * Disappears when returning to top.
+ *
+ * Uses IntersectionObserver to detect when hero is out of view.
+ * Scroll-spy to highlight current section.
+ *
+ * Mobile: Hidden completely.
  */
 export default function HomeSecondaryNav({ items }: { items: SectionLink[] }) {
   const [shown, setShown] = useState(false);
@@ -64,15 +69,14 @@ export default function HomeSecondaryNav({ items }: { items: SectionLink[] }) {
   return (
     <motion.div
       initial={false}
-      animate={shown ? { y: 0, opacity: 1 } : { y: -16, opacity: 0 }}
+      animate={shown ? { y: 0, opacity: 1 } : { y: 16, opacity: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="sticky z-30 pointer-events-none"
-      style={{ top: "160px" }}
+      className="fixed bottom-0 left-0 right-0 z-30 pointer-events-none hidden lg:block"
     >
-      <div className="mx-auto max-w-site px-gutter">
+      <div className="mx-auto max-w-site px-gutter pb-8">
         <nav
-          aria-label="Sections"
-          className="pointer-events-auto rounded-2xl bg-cream shadow-lg flex justify-center gap-3 overflow-x-auto px-8 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="Content sections"
+          className="pointer-events-auto rounded-2xl bg-cream shadow-lg flex justify-center gap-4 overflow-x-auto px-8 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((item) => {
             const isActive = active === item.id;
@@ -81,7 +85,7 @@ export default function HomeSecondaryNav({ items }: { items: SectionLink[] }) {
                 key={item.id}
                 href={`#${item.id}`}
                 onClick={(e) => handleClick(e, item.id)}
-                aria-current={isActive ? "true" : undefined}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "shrink-0 rounded-full px-5 py-2 text-sm font-semibold whitespace-nowrap transition-all duration-300 ease-organic",
                   isActive
