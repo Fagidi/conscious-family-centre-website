@@ -2,35 +2,33 @@
 
 import { useEffect, type ReactNode } from "react";
 import Lenis from "lenis";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { lenisOptions } from "@/lib/motion";
 
 /**
- * Lenis smooth scrolling, driven by GSAP's ticker so ScrollTrigger
- * and the scroll position never disagree. Disabled automatically
- * for users who prefer reduced motion.
+ * Lenis smooth scrolling on its own rAF loop (no global GSAP — per the
+ * approved motion strategy: Framer Motion + Lenis are the default engine).
+ * Lenis updates native scroll position, so Framer's `whileInView`/`useScroll`
+ * work unchanged. Disabled for users who prefer reduced motion.
  */
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    });
-
-    lenis.on("scroll", ScrollTrigger.update);
-
-    const tick = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
+    const lenis = new Lenis(lenisOptions);
+    // Expose the instance so same-page anchor scrolling (e.g. SectionNav) can
+    // go through Lenis instead of fighting it with window.scrollTo.
+    (window as unknown as { lenis?: Lenis }).lenis = lenis;
+    let raf = 0;
+    const tick = (time: number) => {
+      lenis.raf(time);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
 
     return () => {
-      gsap.ticker.remove(tick);
+      cancelAnimationFrame(raf);
       lenis.destroy();
+      delete (window as unknown as { lenis?: Lenis }).lenis;
     };
   }, []);
 

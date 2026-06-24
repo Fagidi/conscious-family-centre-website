@@ -1,99 +1,148 @@
 import type { Metadata } from "next";
-import Image from "@/components/ui/CineImage";
-import { getContactContent, getSiteSettings } from "@/lib/data";
-import ContactForm from "@/components/contact/ContactForm";
-import Reveal from "@/components/animation/Reveal";
-import TextReveal from "@/components/animation/TextReveal";
-import ImageReveal from "@/components/animation/ImageReveal";
-import Parallax from "@/components/animation/Parallax";
+import { getContactPageContent, getSiteSettings, getCamps, getFaqs } from "@/lib/data";
+import Section from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
+import Button from "@/components/ui/Button";
+import Reveal from "@/components/motion/Reveal";
+import FaqPageAccordion from "@/components/faq/FaqPageAccordion";
+import ContactHero from "@/components/contact/ContactHero";
+import ContactInfo from "@/components/contact/ContactInfo";
+import InquiryForm from "@/components/contact/InquiryForm";
+import VisitSection from "@/components/contact/VisitSection";
+import MapSection from "@/components/contact/MapSection";
+import JourneyTimeline from "@/components/contact/JourneyTimeline";
+import CampPromotion from "@/components/contact/CampPromotion";
+import ContactCTA from "@/components/contact/ContactCTA";
+
+export const revalidate = 60;
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://consciousfamilycentre.com";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seo } = await getContactContent();
-  return { title: { absolute: seo.title }, description: seo.description };
+  const { seo } = await getContactPageContent();
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    alternates: { canonical: "/contact" },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: `${siteUrl}/contact`,
+      type: "website",
+      ...(seo.ogImage ? { images: [{ url: seo.ogImage }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title: seo.title, description: seo.description },
+  };
 }
 
 export default async function ContactPage() {
-  const [content, settings] = await Promise.all([getContactContent(), getSiteSettings()]);
+  const [content, settings, camps, faqs] = await Promise.all([
+    getContactPageContent(),
+    getSiteSettings(),
+    getCamps(),
+    getFaqs("general"),
+  ]);
+
+  const featuredCamp = camps.find((c) => c.status === "open") ?? camps[0] ?? null;
+  const faqPreview = faqs.slice(0, 6);
+
+  // JSON-LD: ContactPage + Organization with contact details (from settings).
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": ["Organization", "EducationalOrganization"],
+    name: settings.siteName,
+    url: siteUrl,
+    email: settings.email,
+    telephone: settings.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: settings.address.line,
+      addressLocality: settings.address.area,
+      addressRegion: settings.address.city,
+      addressCountry: "NG",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: settings.phone,
+      email: settings.email,
+      contactType: "customer service",
+    },
+  };
+  const contactPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: content.seo.title,
+    description: content.seo.description,
+    url: `${siteUrl}/contact`,
+  };
 
   return (
     <>
-      <section className="bg-noir pt-40 md:pt-52">
-        <div className="container-site grid grid-cols-1 gap-16 pb-28 md:pb-40 lg:grid-cols-12">
-          {/* Left — invitation + details */}
-          <div className="lg:col-span-5">
-            <Reveal y={24}>
-              <p className="eyebrow mb-8 flex items-center gap-4">
-                <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-                {content.eyebrow}
-              </p>
-            </Reveal>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }} />
 
-            <TextReveal
-              as="h1"
-              immediate
-              delay={0.25}
-              lines={content.titleLines}
-              className="font-display text-display-lg font-light"
-            />
+      <ContactHero hero={content.hero} />
 
-            <Reveal delay={0.45}>
-              <p className="mt-8 max-w-md text-base font-light leading-relaxed text-ivory-dim">
-                {content.body}
-              </p>
-            </Reveal>
+      {/* Welcome */}
+      <Section tone="cream" spacing="lg" width="prose">
+        <Reveal className="text-center">
+          <p className="eyebrow mb-3">{content.welcome.eyebrow}</p>
+          <h2 className="text-display-md">{content.welcome.heading}</h2>
+          <div className="mt-6 space-y-4 text-lg leading-relaxed text-bark-700/85">
+            {content.welcome.paragraphs.map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+        </Reveal>
+      </Section>
 
-            <Reveal delay={0.55} className="mt-14 space-y-7">
-              <div>
-                <p className="eyebrow mb-2">Email</p>
-                <a
-                  href={`mailto:${settings.email}`}
-                  className="link-underline font-display text-xl font-light text-ivory hover:text-amethyst-bright"
-                >
-                  {settings.email}
-                </a>
-              </div>
-              <div>
-                <p className="eyebrow mb-2">Phone</p>
-                <a
-                  href={`tel:${settings.phone.replace(/[^+\d]/g, "")}`}
-                  className="link-underline font-display text-xl font-light text-ivory hover:text-amethyst-bright"
-                >
-                  {settings.phone}
-                </a>
-              </div>
-              <div>
-                <p className="eyebrow mb-2">Based In</p>
-                <p className="font-display text-xl font-light text-ivory">{settings.location}</p>
-                <p className="mt-2 text-xs font-light uppercase tracking-[0.2em] text-ivory-faint">
-                  {settings.serviceArea}
-                </p>
-              </div>
-            </Reveal>
-
-            <ImageReveal className="mt-16 hidden aspect-[4/5] max-w-sm lg:block" delay={0.3}>
-              <Parallax className="h-full" amount={12}>
-                <Image
-                  src={content.image}
-                  alt={content.imageAlt}
-                  fill
-                  sizes="384px"
-                  className="object-cover"
-                />
-              </Parallax>
-            </ImageReveal>
+      {/* Contact info + inquiry form */}
+      <Section tone="sage" spacing="lg">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <SectionHeading eyebrow="Reach us directly" title="Our details." className="mb-8" />
+            <ContactInfo settings={settings} />
           </div>
 
-          {/* Right — form */}
-          <div className="lg:col-span-6 lg:col-start-7">
-            <Reveal delay={0.4}>
-              <div className="border border-noir-line p-8 md:p-14">
-                <p className="eyebrow mb-10">Booking Inquiry</p>
-                <ContactForm eventTypes={content.eventTypes} />
+          <Reveal>
+            <div className="rounded-card-lg border border-forest-700/10 bg-white p-6 shadow-soft md:p-8">
+              {content.form.eyebrow && <p className="eyebrow mb-3">{content.form.eyebrow}</p>}
+              <h2 className="text-display-sm text-forest-900">{content.form.heading}</h2>
+              {content.form.intro && <p className="mt-2 text-bark-700/80">{content.form.intro}</p>}
+              <div className="mt-6">
+                <InquiryForm />
               </div>
-            </Reveal>
-          </div>
+            </div>
+          </Reveal>
         </div>
-      </section>
+      </Section>
+
+      <VisitSection visit={content.visit} />
+      <MapSection settings={settings} />
+      <JourneyTimeline journey={content.journey} />
+      <CampPromotion content={content.camp} camp={featuredCamp} />
+
+      {/* FAQ preview */}
+      {faqPreview.length > 0 && (
+        <Section tone="cream" spacing="lg">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div>
+              <SectionHeading eyebrow={content.faq.eyebrow} title={content.faq.heading} />
+              <div className="mt-6">
+                <Button href="/faq" variant="ghost">
+                  View all FAQs
+                </Button>
+              </div>
+            </div>
+            <Reveal delay={0.05}>
+              <FaqPageAccordion items={faqPreview} idPrefix="contact-faq" />
+            </Reveal>
+          </div>
+        </Section>
+      )}
+
+      <ContactCTA content={content.finalCta} />
     </>
   );
 }

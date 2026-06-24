@@ -1,135 +1,133 @@
 import type { Metadata } from "next";
-import Image from "@/components/ui/CineImage";
-import { getHero, getAboutPage } from "@/lib/data";
-import PageHero from "@/components/shared/PageHero";
-import CtaSection from "@/components/shared/CtaSection";
-import SectionHeading from "@/components/ui/SectionHeading";
-import Reveal from "@/components/animation/Reveal";
-import ImageReveal from "@/components/animation/ImageReveal";
-import Parallax from "@/components/animation/Parallax";
-import TextReveal from "@/components/animation/TextReveal";
+import { getAboutContent, getSiteSettings, getTeam, getTestimonials } from "@/lib/data";
+import AboutHero from "@/components/about/AboutHero";
+import OurStory from "@/components/about/OurStory";
+import MissionSection from "@/components/about/MissionSection";
+import VisionSection from "@/components/about/VisionSection";
+import Philosophy from "@/components/about/Philosophy";
+import Differentiators from "@/components/about/Differentiators";
+import LearningEnvironment from "@/components/about/LearningEnvironment";
+import MeetTheTeam from "@/components/about/MeetTheTeam";
+import AboutTestimonials from "@/components/about/AboutTestimonials";
+import CommunityStatement from "@/components/about/CommunityStatement";
+import Community from "@/components/about/Community";
+import VisitUs from "@/components/about/VisitUs";
+import StatsSection from "@/components/shared/StatsSection";
+import SectionNav from "@/components/layout/SectionNav";
+import FinalCta from "@/components/home/FinalCta";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://consciousfamilycentre.com";
+
+const ABOUT_SECTIONS = [
+  { id: "our-story", label: "Story" },
+  { id: "mission", label: "Mission" },
+  { id: "vision", label: "Vision" },
+  { id: "environment", label: "Environment" },
+  { id: "community", label: "Community" },
+  { id: "visit", label: "Visit Us" },
+];
+
+const IMPACT_STATS = [
+  { value: 200, suffix: "+", label: "Families Served" },
+  { value: 4, suffix: "+", label: "Core Programs" },
+  { value: 3, suffix: "+", label: "Years of Nurturing" },
+  { value: 6, suffix: "+", label: "Days a Week" },
+];
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seo } = await getAboutPage();
-  return { title: { absolute: seo.title }, description: seo.description };
+  const { seo } = await getAboutContent();
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    alternates: { canonical: "/about" },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: `${siteUrl}/about`,
+      type: "website",
+      ...(seo.ogImage ? { images: [{ url: seo.ogImage }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title: seo.title, description: seo.description },
+  };
 }
 
 export default async function AboutPage() {
-  const [hero, page] = await Promise.all([getHero("about"), getAboutPage()]);
-  const { story, pillarsSection, pillars, closing } = page;
+  const [about, settings, team, testimonials] = await Promise.all([
+    getAboutContent(),
+    getSiteSettings(),
+    getTeam(),
+    getTestimonials(),
+  ]);
+
+  // JSON-LD Organization schema, built from CMS-managed site settings.
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": ["EducationalOrganization", "ChildCare"],
+    name: settings.siteName,
+    description: about.hero.mission,
+    url: siteUrl,
+    telephone: settings.phone,
+    email: settings.email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: settings.address.line,
+      addressLocality: settings.address.area,
+      addressRegion: settings.address.city,
+      addressCountry: "NG",
+    },
+    sameAs: Object.values(settings.socials).filter(Boolean),
+  };
 
   return (
     <>
-      <PageHero
-        eyebrow={hero.eyebrow}
-        titleLines={hero.titleLines}
-        image={hero.image}
-        imageAlt={hero.imageAlt}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
       />
+      <SectionNav items={ABOUT_SECTIONS} />
+      <AboutHero hero={about.hero} />
 
-      {/* The story — editorial two-column with offset imagery */}
-      <section className="bg-noir py-28 md:py-40">
-        <div className="container-site">
-          <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
-            <div className="md:col-span-5">
-              <SectionHeading eyebrow={story.eyebrow} lines={story.titleLines} />
-            </div>
-            <div className="space-y-8 md:col-span-5 md:col-start-8">
-              <Reveal stagger={0.15}>
-                {story.paragraphs.map((p, i) => (
-                  <p
-                    key={i}
-                    className={`text-base font-light leading-loose ${
-                      i === 0 ? "text-ivory" : "text-ivory-dim"
-                    } ${i > 0 ? "mt-8" : ""}`}
-                  >
-                    {p}
-                  </p>
-                ))}
-              </Reveal>
-            </div>
-          </div>
+      <div id="our-story" className="scroll-mt-24">
+        <OurStory story={about.story} />
+      </div>
 
-          {/* Offset image pairing */}
-          <div className="mt-24 grid grid-cols-1 gap-6 md:mt-36 md:grid-cols-12 md:gap-8">
-            <ImageReveal className="aspect-[4/3] md:col-span-7">
-              <Parallax className="h-full" amount={10}>
-                <Image
-                  src={story.image}
-                  alt={story.imageAlt}
-                  fill
-                  sizes="(min-width: 768px) 58vw, 100vw"
-                  className="object-cover"
-                />
-              </Parallax>
-            </ImageReveal>
-            <ImageReveal className="aspect-[3/4] md:col-span-4 md:col-start-9 md:mt-28" delay={0.15}>
-              <Parallax className="h-full" amount={14}>
-                <Image
-                  src={story.secondImage}
-                  alt={story.secondImageAlt}
-                  fill
-                  sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover"
-                />
-              </Parallax>
-            </ImageReveal>
-          </div>
-        </div>
-      </section>
+      <div id="mission" className="scroll-mt-24">
+        <MissionSection statement={about.hero.mission} />
+      </div>
 
-      {/* Standards */}
-      <section className="bg-noir-soft py-28 md:py-40">
-        <div className="container-site">
-          <SectionHeading
-            eyebrow={pillarsSection.eyebrow}
-            lines={pillarsSection.titleLines}
-            className="mb-20"
-          />
-          <div className="grid grid-cols-1 gap-px bg-noir-line sm:grid-cols-2">
-            {pillars.map((pillar, i) => (
-              <Reveal key={pillar.title} delay={i * 0.08} className="bg-noir-soft">
-                <div className="group h-full p-10 transition-colors duration-700 ease-luxe hover:bg-noir-raise md:p-14">
-                  <p className="font-display text-sm italic text-amethyst-bright">
-                    0{i + 1}
-                  </p>
-                  <h3 className="mt-6 font-display text-2xl font-light md:text-3xl">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-5 max-w-sm text-sm font-light leading-relaxed text-ivory-dim">
-                    {pillar.description}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <div id="vision" className="scroll-mt-24">
+        <VisionSection
+          statement={about.story.pullQuote ?? about.hero.mission}
+          image={about.environment.images[0] ?? about.community.image}
+        />
+      </div>
 
-      {/* The people */}
-      <section className="bg-noir py-32 md:py-44">
-        <div className="container-site text-center">
-          <Reveal>
-            <p className="eyebrow mb-10 flex items-center justify-center gap-4">
-              <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-              {closing.eyebrow}
-              <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-            </p>
-          </Reveal>
-          <TextReveal
-            as="h2"
-            lines={closing.titleLines}
-            className="font-display text-display-md font-light"
-          />
-          <Reveal delay={0.2}>
-            <p className="mx-auto mt-10 max-w-xl text-base font-light leading-relaxed text-ivory-dim">
-              {closing.body}
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <StatsSection eyebrow="By the numbers" heading="Our impact so far." stats={IMPACT_STATS} tone="sage" />
 
-      <CtaSection />
+      <Philosophy philosophy={about.philosophy} />
+      <Differentiators differentiators={about.differentiators} />
+
+      <div id="environment" className="scroll-mt-24">
+        <LearningEnvironment environment={about.environment} />
+      </div>
+
+      <div id="team" className="scroll-mt-24">
+        <MeetTheTeam content={about.team} team={team} />
+      </div>
+
+      <AboutTestimonials content={about.testimonials} testimonials={testimonials} />
+
+      <div id="community" className="scroll-mt-24">
+        <CommunityStatement />
+        <Community community={about.community} />
+      </div>
+
+      <div id="visit" className="scroll-mt-24">
+        <VisitUs settings={settings} image={about.community.image} />
+      </div>
+
+      <FinalCta content={about.finalCta} />
     </>
   );
 }

@@ -1,120 +1,42 @@
-# SARAI — Luxury Photo Booth & Event Experiences
+# Conscious Family Centre
 
-A luxury digital experience for **Sarai Photo Booth**, Long Island, New York.
-Built with Next.js 15, TypeScript, Tailwind CSS, GSAP, Three.js, and Sanity CMS.
-Deploys to Netlify.
+Website for **Conscious Family Centre** — nature-connected learning, playgroup,
+forest school, homeschool community, and holiday camps for children 0–10 in
+Wuse 2, Abuja.
 
----
+Built with Next.js 15 (App Router), TypeScript, Tailwind CSS, GSAP + Lenis, and
+Sanity CMS. Deploys to Netlify.
 
-## Sitemap
+> **Status:** architecture scaffolded; pages not yet built. See the planning &
+> architecture docs before contributing.
 
-| Route | Page | Purpose |
-| --- | --- | --- |
-| `/` | Home | Cinematic hero, brand manifesto, experience index, gallery film-strip, testimonials, closing invitation |
-| `/about` | About | Brand story, standards, team philosophy |
-| `/services` | Services | Five experiences in full editorial detail + booking process |
-| `/faq` | FAQ | Grouped accordion: Booking, The Experience, Logistics, Customization |
-| `/contact` | Contact | Booking inquiry form (Netlify Forms) + contact details |
-| `/studio` | Sanity Studio | Embedded CMS for editors |
+## Docs
 
-## Design System
+- [docs/BLUEPRINT.md](docs/BLUEPRINT.md) — strategy: UX/content audit, IA, sitemap, design system, camp registration & admissions strategy, CMS architecture, SEO, motion system.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — folder & route structure, CMS integration strategy, server-action strategy.
 
-- **Color** — `noir` blacks (~70%), `ivory` whites (~25%), `amethyst` purple (~5%, accent only: CTAs, hovers, links, hairlines). Tokens live in `tailwind.config.ts`.
-- **Type** — Cormorant Garamond (editorial display serif) + Manrope (refined sans). Fluid display scales: `text-display-xl/lg/md/sm`, tracked uppercase `eyebrow` labels.
-- **Motion** — GSAP + ScrollTrigger + Lenis smooth scroll. House primitives in `components/animation/`: `Reveal` (fade-rise), `TextReveal` (masked-line headlines), `ImageReveal` (clip-path curtain), `Parallax` (scrub drift). Three.js ambient particles (`components/three/AmbientParticles.tsx`) add quiet depth to the hero. All motion respects `prefers-reduced-motion`.
-
-## Architecture
-
-```
-app/
-  layout.tsx              Root: fonts, global SEO metadata
-  (site)/                 Public site (header/footer/smooth scroll)
-    page.tsx              Home
-    about/  services/  faq/  contact/
-  studio/[[...tool]]/     Embedded Sanity Studio
-  sitemap.ts  robots.ts   SEO routes
-components/
-  animation/              GSAP primitives (Reveal, TextReveal, ImageReveal, Parallax)
-  three/                  AmbientParticles
-  layout/  ui/  shared/   Header, Footer, Button, SectionHeading, PageHero, CtaSection
-  home/  faq/  contact/   Page-specific sections
-lib/
-  types.ts                Shared content types (Sanity ⇄ fallback contract)
-  content.ts              Curated default content (full launch copy)
-  data.ts                 Data access layer used by pages
-  sanity/                 Client + GROQ queries
-sanity/schemas/           CMS schemas
-sanity.config.ts          Studio configuration
-netlify.toml              Netlify build + headers
-public/__forms.html       Netlify Forms detection file
-```
-
-## Content & CMS
-
-Pages read everything through `lib/data.ts`. If Sanity is configured and a
-document is published, **Sanity wins field-by-field**; missing documents and
-missing fields both resolve to the curated defaults in `lib/content.ts`, so a
-half-finished document can never blank out a section. Pages revalidate every
-60 seconds — published edits go live without a redeploy.
-
-Every piece of page content is editable in Studio:
-
-| Studio section | Schema | Covers |
-| --- | --- | --- |
-| Pages → Home | `homePage` | manifesto, stats, section headings, page SEO |
-| Pages → About | `aboutPage` | story, standards/pillars, closing, page SEO |
-| Pages → Services | `servicesPage` | process steps + heading, page SEO |
-| Pages → FAQ | `faqPage` | side note card, page SEO |
-| Pages → Contact | `contactInfo` | headline, copy, image, event types, page SEO |
-| Hero Content | `hero` | one hero per page (home / about / services / faq) |
-| Services | `service` | the five experience articles |
-| Testimonials | `testimonial` | quotes |
-| Gallery | `galleryImage` | film-strip imagery |
-| FAQ | `faqItem` | questions, grouped by category |
-| Closing CTA | `ctaSection` | shared full-bleed invitation on every page |
-| Site Settings | `siteSettings` | contact details, announcement, footer headline |
-| SEO Settings | `seoSettings` | global meta defaults, OG image, keywords |
-
-Layout, animation, components, and the design system stay in code.
-
-### Connect Sanity
-
-1. Create a project at [sanity.io/manage](https://sanity.io/manage).
-2. Copy `.env.example` → `.env.local` and set `NEXT_PUBLIC_SANITY_PROJECT_ID`.
-3. Add `http://localhost:3000` (and your production domain) to the project's CORS origins.
-4. Visit `/studio`, sign in, and publish content.
-
-### Seed the launch content
-
-To start editors from the live copy instead of empty documents, create a token
-with **Editor** rights (sanity.io/manage → API → Tokens), add it to `.env.local`
-as `SANITY_WRITE_TOKEN`, then run:
-
-```bash
-npm run seed
-```
-
-The script is idempotent (stable document IDs, create-or-replace) and uploads
-the placeholder imagery to Sanity's CDN as real image assets.
-
-## Development
+## Develop
 
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm run build      # production build
-npm run typecheck  # strict TypeScript check
+npm run typecheck  # strict TypeScript (foundation passes clean)
+npm run build      # production build (once pages exist)
 ```
 
-## Deploy to Netlify
+## Configure
 
-1. Push to a Git repository and import it in Netlify — `netlify.toml` configures
-   the build (`npm run build`) and the official Next.js runtime plugin.
-2. Set environment variables from `.env.example` in **Site settings → Environment**.
-3. The booking form posts to Netlify Forms automatically (registered via
-   `public/__forms.html`). Enable notifications under **Forms → Notifications**.
+Copy `.env.example` → `.env.local` and fill in:
 
-## Credits
+- **Sanity** — `NEXT_PUBLIC_SANITY_PROJECT_ID` + `SANITY_WRITE_TOKEN` (Editor; needed for registrations/enquiries).
+- **Payments** — `PAYMENT_PROVIDER` and Paystack/Flutterwave keys (gateway-agnostic; both supported).
+- **Notifications** — optional Resend keys; no-ops until set.
 
-Photography placeholders served from Unsplash; replace via Sanity's gallery
-and hero documents as real event imagery becomes available.
+The site renders with curated fallback content (`lib/content.ts`) until Sanity
+documents are published. Studio is at `/studio`.
+
+## Architecture at a glance
+
+- **Read:** pages → `lib/data.ts` (typed getters, fallback-first) → GROQ → Sanity, revalidated every 60s.
+- **Write:** server actions in `lib/actions/*` return `ActionResult`; payments behind a `PaymentProvider` interface; camp seats enforced at webhook fulfilment.
+- **Design system:** tokens in `tailwind.config.ts` (earth/foliage palette, Fraunces + Inter); motion tokens in `lib/motion.ts`.

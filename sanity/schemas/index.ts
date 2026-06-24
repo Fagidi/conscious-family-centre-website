@@ -1,31 +1,27 @@
-import { siteSettings } from "./siteSettings";
-import { seoSettings } from "./seoSettings";
-import { hero } from "./hero";
-import { homePage } from "./homePage";
-import { aboutPage } from "./aboutPage";
-import { servicesPage } from "./servicesPage";
-import { faqPage } from "./faqPage";
-import { ctaSection } from "./ctaSection";
-import { service } from "./service";
-import { testimonial } from "./testimonial";
-import { galleryImage } from "./galleryImage";
-import { faqItem } from "./faqItem";
-import { contactInfo } from "./contactInfo";
+import type { SchemaTypeDefinition } from "sanity";
 
-export const schemaTypes = [
-  // Singletons
-  siteSettings,
-  seoSettings,
-  homePage,
-  aboutPage,
-  servicesPage,
-  faqPage,
-  contactInfo,
-  ctaSection,
-  // Collections
-  hero,
-  service,
-  testimonial,
-  galleryImage,
-  faqItem,
+import { sharedObjects } from "./objects/shared";
+import { peopleObjects } from "./objects/people";
+import { sectionObjects } from "./objects/sections";
+
+import { learningDocuments } from "./documents/learning";
+import { formDocuments } from "./documents/forms";
+import { proofDocuments } from "./documents/proof";
+import { editorialDocuments } from "./documents/editorial";
+
+import { singletons } from "./singletons/settings";
+
+/**
+ * Schema registry. Objects first (referenced by documents), then documents,
+ * then singletons. Mirrors the Studio desk in sanity/structure.ts.
+ */
+export const schemaTypes: SchemaTypeDefinition[] = [
+  ...sharedObjects,
+  ...peopleObjects,
+  ...sectionObjects,
+  ...learningDocuments,
+  ...formDocuments,
+  ...proofDocuments,
+  ...editorialDocuments,
+  ...singletons,
 ];

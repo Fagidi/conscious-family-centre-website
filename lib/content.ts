@@ -1,476 +1,900 @@
 import type {
   SiteSettings,
-  SeoSettings,
-  HeroContent,
-  Service,
+  Navigation,
+  HomeContent,
+  AboutContent,
+  ProgramsPageContent,
+  GalleryPageContent,
+  ContactPageContent,
+  Program,
+  ProgramPreview,
+  CampSession,
   Testimonial,
-  GalleryImage,
+  GalleryItem,
+  GalleryCategory,
+  FeaturedStory,
   FaqItem,
-  HomePageContent,
-  AboutPageContent,
-  ServicesPageContent,
+  FaqCategoryDoc,
   FaqPageContent,
-  ContactContent,
-  CtaContent,
 } from "./types";
 
 /**
- * Curated default content.
+ * Curated fallback content. The site is whole before any Sanity document
+ * exists; published documents win field-by-field (see client.ts).
  *
- * This is the launch copy for the entire site. Every field here can be
- * overridden from Sanity Studio — when a matching document is published,
- * Sanity wins field-by-field; otherwise this content renders. The site
- * is therefore fully deployable before the CMS is ever touched.
- *
- * `scripts/seed.ts` pushes this exact content into the Sanity dataset
- * so editors start from the live copy instead of empty documents.
+ * Content sourcing rule (Phase 3): only real Conscious Family Centre content
+ * is used as fact (ages 0–10, Wuse 2 location, hours, real program names,
+ * nature/play/community identity). Where real copy isn't available verbatim
+ * (testimonial quotes, exact hero wording, camp pricing/images), these are
+ * clearly-marked CMS placeholders for editors to replace — nothing invented
+ * is presented as fact. Placeholder imagery uses picsum (see next.config).
  */
 
-const u = (id: string, w = 2400) =>
-  `https://images.unsplash.com/${id}?q=80&w=${w}&auto=format&fit=crop`;
-
-/* ────────────────────────── Site settings ────────────────────────── */
+const placeholderImage = (seed: string, alt: string) => ({
+  src: `https://picsum.photos/seed/${seed}/1600/1100`,
+  alt,
+});
 
 export const siteSettings: SiteSettings = {
-  siteName: "Sarai Photo Booth",
-  tagline: "Luxury photo booth & event experiences",
-  phone: "(516) 555-0184",
-  email: "hello@saraiphotobooth.com",
-  location: "Long Island, New York",
-  serviceArea: "Serving Long Island, the Hamptons & the New York metro area",
-  instagram: "https://instagram.com/saraiphotobooth",
-  bookingCtaLabel: "Reserve Your Date",
-  announcement: "Now booking 2026 & 2027 weddings",
-  footerInvitationLines: ["Begin the", "conversation."],
+  siteName: "Conscious Family Centre",
+  tagline: "Nature-connected learning where children and families grow.",
+  phone: "+234 803 518 3784",
+  whatsapp: "+234 803 518 3784",
+  email: "hello@consciousfamilycentre.com",
+  address: {
+    line: "Inside BMT Garden, Opp. Legacy Centre",
+    area: "Wuse 2",
+    city: "Abuja, FCT 904101",
+    mapUrl: "https://maps.google.com/?q=BMT+Garden+Wuse+2+Abuja",
+  },
+  hours: ["Mon–Sat: 10:00 – 15:00", "Sun: Closed"],
+  socials: {
+    instagram: "https://instagram.com/consciousfamilycentre",
+    facebook: "https://facebook.com/consciousfamilycentre",
+  },
+  announcement: {
+    active: true,
+    text: "Summer Camp registration is now open — places are limited.",
+    ctaLabel: "Register",
+    link: "/camp-registration",
+  },
+  defaultSeo: {
+    title: "Conscious Family Centre — Nature-Connected Learning in Abuja",
+    description:
+      "A nature-connected playgroup and alternative-learning community in Wuse 2, Abuja, for children 0–10. Stay & play, homeschool hub, forest school, holiday camps and more.",
+    keywords: [
+      "playgroup Abuja",
+      "forest school Abuja",
+      "homeschool community Wuse 2",
+      "holiday camp for kids Abuja",
+      "nanny training Abuja",
+    ],
+  },
 };
 
-export const seoSettings: SeoSettings = {
-  metaTitle: "Sarai Photo Booth — Luxury Photo Booth & Event Experiences | Long Island, NY",
-  metaDescription:
-    "Sarai is Long Island's luxury photo booth and event experience house. Signature booths, 360 experiences, and editorial-grade keepsakes for weddings, corporate events, and private celebrations.",
-  keywords: [
-    "luxury photo booth Long Island",
-    "wedding photo booth New York",
-    "360 photo booth Hamptons",
-    "corporate event photo booth NYC",
-    "luxury event experiences Long Island",
+export const navigation: Navigation = {
+  header: [
+    { label: "Home", href: "/" },
+    { label: "About", href: "/about" },
+    { label: "Programs", href: "/programs" },
+    { label: "Gallery", href: "/gallery" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Contact", href: "/contact" },
+  ],
+  footer: [
+    {
+      heading: "Explore",
+      links: [
+        { label: "About", href: "/about" },
+        { label: "Programs", href: "/programs" },
+        { label: "Gallery", href: "/gallery" },
+        { label: "FAQ", href: "/faq" },
+      ],
+    },
+    {
+      heading: "Get started",
+      links: [
+        { label: "Book a Visit", href: "/contact" },
+        { label: "Summer Camp", href: "/camp-registration" },
+        { label: "Contact Us", href: "/contact" },
+      ],
+    },
   ],
 };
 
-/* ────────────────────────── Page heroes ────────────────────────── */
+/* ── Homepage ──────────────────────────────────────────────────── */
 
-export const heroes: Record<"home" | "about" | "services" | "faq", HeroContent> = {
-  home: {
-    eyebrow: "Luxury Photo Booth & Event Experiences — Long Island, New York",
-    titleLines: ["Some moments", "deserve forever."],
-    subtitle:
-      "Sarai designs photographic experiences for weddings, corporate events, and celebrations where every detail matters — including this one.",
-    ctaLabel: "Reserve Your Date",
-    ctaHref: "/contact",
-    secondaryCtaLabel: "Explore the Experience",
-    secondaryCtaHref: "/services",
-    image: u("photo-1519741497674-611481863552"),
-    imageAlt: "Bride and groom in cinematic evening light at a luxury wedding",
+export const homeContent: HomeContent = {
+  hero: {
+    eyebrow: "Wuse 2, Abuja · Ages 0–10",
+    headline: "Where children grow through nature, play, and community.",
+    subhead:
+      "A nature-connected playgroup and alternative-learning community for children 0–10 — rooted in play, the outdoors, and conscious family support.",
+    image: placeholderImage("cfc-hero", "Children exploring and playing outdoors at Conscious Family Centre"),
+    primaryCta: { label: "Book a Visit", href: "/contact", variant: "primary" },
+    secondaryCta: { label: "Explore Programs", href: "/programs", variant: "ghost" },
+    tertiaryCta: { label: "Summer Camp Registration", href: "/camp-registration", variant: "secondary" },
+  },
+  why: {
+    eyebrow: "Why families choose us",
+    heading: "A gentler, richer way to grow up.",
+    intro: "Everything we do is built around the natural world, child-led play, and a community that supports the whole family.",
+    pillars: [
+      {
+        title: "Nature-connected learning",
+        description: "Forest school, outdoor play, and weekly Waka Wednesday excursions keep children connected to the natural world.",
+        icon: "leaf",
+      },
+      {
+        title: "Learning through play",
+        description: "Play-based, child-led days that nurture curiosity, creativity, and quiet confidence.",
+        icon: "sprout",
+      },
+      {
+        title: "A real community",
+        description: "A warm hub for families and homeschoolers, with enrichment clubs and shared support.",
+        icon: "compass",
+      },
+      {
+        title: "Conscious, caring people",
+        description: "Intentional, nurturing care for the whole child — and for the families and carers around them.",
+        icon: "sun",
+      },
+    ],
   },
   about: {
-    eyebrow: "About Sarai",
-    titleLines: ["Built on a simple belief:", "memory is a luxury."],
-    image: u("photo-1511795409834-ef04bbd61622"),
-    imageAlt: "Guests gathered around an elegant candlelit dinner table",
+    eyebrow: "About us",
+    heading: "More than a centre — a community for conscious families.",
+    paragraphs: [
+      "Conscious Family Centre is a nature-connected playgroup and alternative-learning community in Wuse 2, Abuja, for children from birth to age 10.",
+      "We believe children learn best through play and time in nature, supported by a community that cares for the whole family. From stay-and-play sessions to forest school and our homeschool hub, every day is built around curiosity, connection, and joy.",
+    ],
+    image: placeholderImage("cfc-about", "Children and carers together at Conscious Family Centre"),
+    cta: { label: "Learn More", href: "/about", variant: "ghost" },
   },
-  services: {
-    eyebrow: "The Experiences",
-    titleLines: ["Designed for rooms", "where details matter."],
-    subtitle:
-      "Five experiences, one standard. Each is designed to your event — its palette, its light, its people — and run by a team that treats hospitality as part of the photograph.",
+  programs: {
+    eyebrow: "Our programs",
+    heading: "Programs for every age and stage.",
+    intro: "From little ones to big kids — play, nature, and learning, woven through every week.",
+    cta: { label: "View All Programs", href: "/programs", variant: "ghost" },
+  },
+  camp: {
+    eyebrow: "Holiday camp",
+    heading: "Summer STEAM Holiday Camp",
+    intro: "A holiday of STEAM projects, forest-school adventures, and creative play. Places are limited.",
+  },
+  gallery: {
+    eyebrow: "Life at CFC",
+    heading: "Moments from our days.",
+    intro: "Muddy boots, big ideas, and plenty of joy.",
+    cta: { label: "View Gallery", href: "/gallery", variant: "ghost" },
+  },
+  testimonials: {
+    eyebrow: "Loved by our families",
+    heading: "What parents say.",
   },
   faq: {
-    eyebrow: "Questions, Answered",
-    titleLines: ["Everything you'd ask", "over a glass of champagne."],
-    subtitle:
-      "The details behind booking, logistics, and the experience itself. If your question isn't here, we're one note away.",
+    eyebrow: "Good to know",
+    heading: "Questions, answered.",
+    cta: { label: "View All FAQs", href: "/faq", variant: "ghost" },
   },
-};
-
-/* ────────────────────────── Home page ────────────────────────── */
-
-export const homePage: HomePageContent = {
-  manifesto: {
-    eyebrow: "The Sarai Standard",
-    lines: [
-      "A photo booth is equipment.",
-      "An experience is a memory.",
-      "We only build the second kind.",
+  finalCta: {
+    eyebrow: "Come and see",
+    heading: "Come and feel the difference.",
+    body: "Visit us in Wuse 2, ask us anything, or secure a place at Summer Camp.",
+    ctas: [
+      { label: "Book a Visit", href: "/contact", variant: "primary" },
+      { label: "Contact Us", href: "/contact", variant: "ghost" },
+      { label: "Register for Camp", href: "/camp-registration", variant: "secondary" },
     ],
-    body: "Every Sarai installation is designed like a moment of the event itself — considered lighting, curated backdrops, attendants in black tie, and prints your guests will keep for decades. Nothing inflatable. Nothing ordinary.",
   },
-  stats: [
-    { value: "350+", label: "Events captured" },
-    { value: "120K", label: "Moments delivered" },
-    { value: "5.0", label: "Average client rating" },
-    { value: "48hrs", label: "Gallery turnaround" },
-  ],
-  servicesSection: {
-    eyebrow: "The Experiences",
-    titleLines: ["Five ways to make", "an evening unforgettable."],
-  },
-  gallerySection: {
-    eyebrow: "From Recent Evenings",
-    title: "The work, unposed.",
-  },
-  testimonialsEyebrow: "In Their Words",
   seo: {
-    title: "Sarai Photo Booth — Luxury Photo Booth & Event Experiences | Long Island, NY",
-    description: seoSettings.metaDescription,
+    title: "Conscious Family Centre — Nature-Connected Learning in Abuja",
+    description:
+      "Nature-connected playgroup and alternative-learning community in Wuse 2, Abuja, for children 0–10: stay & play, forest school, homeschool hub, and holiday camps.",
   },
 };
 
-export const galleryImages: GalleryImage[] = [
-  { src: u("photo-1519225421980-715cb0215aed", 1600), alt: "First dance under string lights at an estate wedding" },
-  { src: u("photo-1469371670807-013ccf25f16a", 1600), alt: "Candlelit reception tables in a grand ballroom" },
-  { src: u("photo-1511795409834-ef04bbd61622", 1600), alt: "Guests toasting at an elegant dinner celebration" },
-  { src: u("photo-1492684223066-81342ee5ff30", 1600), alt: "Sparklers raised during an evening celebration" },
-  { src: u("photo-1529636798458-92182e662485", 1600), alt: "Couple dancing surrounded by guests and warm light" },
-  { src: u("photo-1519167758481-83f550bb49b3", 1600), alt: "Grand ballroom dressed in white florals and candlelight" },
-  { src: u("photo-1465495976277-4387d4b0b4c6", 1600), alt: "Bride holding a bouquet in soft window light" },
-  { src: u("photo-1464366400600-7168b8af9bc3", 1600), alt: "Black-tie guests mingling at a gala reception" },
+/* ── About page ────────────────────────────────────────────────── */
+
+export const aboutContent: AboutContent = {
+  hero: {
+    eyebrow: "About Conscious Family Centre",
+    title: "A place where childhood is allowed to unfold.",
+    mission:
+      "We are a nature-connected playgroup and alternative-learning community in Wuse 2, Abuja — nurturing children from birth to age 10 through play, the outdoors, and conscious support for the whole family.",
+    image: placeholderImage("cfc-about-hero", "Children exploring the garden at Conscious Family Centre"),
+  },
+  story: {
+    eyebrow: "Our story",
+    heading: "Built around a simple belief.",
+    paragraphs: [
+      "Conscious Family Centre grew from a simple conviction: that children learn best when they are free to play, to wonder, and to spend their days close to nature.",
+      "So we made a place for exactly that — an unhurried, nature-connected community in the heart of Wuse 2, where days are shaped by curiosity rather than the clock, and where the whole family is welcomed in.",
+      "Today we are a growing community of families and homeschoolers across Abuja, learning together through stay-and-play mornings, forest-school adventures, and a home for those choosing a gentler path.",
+    ],
+    image: placeholderImage("cfc-story", "A quiet, joyful moment between a child and carer at the centre"),
+    pullQuote: "Children learn best through play and time in nature, supported by a community that cares for the whole family.",
+  },
+  philosophy: {
+    eyebrow: "Our philosophy",
+    heading: "How children learn here.",
+    intro: "Four beliefs shape every day at the centre — and everything we ask of ourselves as a community.",
+    cards: [
+      {
+        title: "Conscious learning",
+        description: "Intentional, unhurried days that follow a child's natural rhythm — not a rigid timetable.",
+        icon: "sun",
+      },
+      {
+        title: "Child-led exploration",
+        description: "Play-based, self-directed discovery that nurtures curiosity, creativity, and quiet confidence.",
+        icon: "sprout",
+      },
+      {
+        title: "Family-centred approach",
+        description: "We care for the whole family — supporting parents, carers, and homeschoolers, not just children.",
+        icon: "compass",
+      },
+      {
+        title: "Nature connection",
+        description: "Forest school, outdoor play, and weekly excursions keep children rooted in the natural world.",
+        icon: "leaf",
+      },
+    ],
+  },
+  differentiators: {
+    eyebrow: "What makes us different",
+    heading: "Not a typical childcare centre.",
+    intro: "Why families across Abuja are choosing a different way to grow up.",
+    items: [
+      {
+        title: "Days built around nature",
+        description: "Forest school and weekly Waka Wednesday excursions put the outdoors at the centre of learning.",
+        icon: "leaf",
+      },
+      {
+        title: "Learning through play",
+        description: "Child-led, play-based days that protect curiosity and let confidence grow at its own pace.",
+        icon: "sprout",
+      },
+      {
+        title: "A real community",
+        description: "A warm hub for families and homeschoolers — enrichment clubs, shared support, and friendship.",
+        icon: "compass",
+      },
+      {
+        title: "Care for the whole family",
+        description: "From stay-and-play to nanny training, we support the grown-ups who care for children too.",
+        icon: "sun",
+      },
+    ],
+  },
+  environment: {
+    eyebrow: "Our learning environment",
+    heading: "A garden to grow in.",
+    intro:
+      "Tucked inside BMT Garden in Wuse 2, our spaces are calm, green, and made for exploring — indoors and out.",
+    images: Array.from({ length: 5 }, (_, i) =>
+      placeholderImage(`cfc-env-${i + 1}`, `The learning environment at Conscious Family Centre ${i + 1}`),
+    ),
+  },
+  team: {
+    eyebrow: "Meet the team",
+    heading: "The people who make it home.",
+    intro: "Warm, intentional educators and facilitators who care for the whole child.",
+  },
+  testimonials: {
+    eyebrow: "Loved by our families",
+    heading: "What parents say.",
+  },
+  community: {
+    eyebrow: "Our community",
+    heading: "More than a centre — a family.",
+    paragraphs: [
+      "Belonging is the heart of what we do. Families find each other here over muddy boots and shared mornings, and children grow up surrounded by friends of every age.",
+      "From Waka Wednesday excursions to enrichment clubs and our homeschool hub, there's always a reason to gather, explore, and grow together.",
+    ],
+    image: placeholderImage("cfc-community", "Families gathered together at a Conscious Family Centre event"),
+  },
+  finalCta: {
+    eyebrow: "Come and see",
+    heading: "Come and feel the difference.",
+    body: "Visit us in Wuse 2, explore our programs, or secure a place at Summer Camp.",
+    ctas: [
+      { label: "Book a Visit", href: "/contact", variant: "primary" },
+      { label: "Explore Programs", href: "/programs", variant: "ghost" },
+      { label: "Register for Summer Camp", href: "/camp-registration", variant: "secondary" },
+    ],
+  },
+  seo: {
+    title: "About Us — Our Story, Philosophy & Community",
+    description:
+      "Conscious Family Centre is a nature-connected family learning centre in Wuse 2, Abuja. Discover our story, our conscious-education philosophy, and the community children grow up in.",
+    keywords: [
+      "family learning centre Abuja",
+      "conscious education Abuja",
+      "nature-based learning Wuse 2",
+      "forest school philosophy",
+      "homeschool community Abuja",
+    ],
+  },
+};
+
+/* ── Collection fallbacks (real program names; placeholders elsewhere) ── */
+
+export const featuredPrograms: ProgramPreview[] = [
+  {
+    slug: "stay-and-play",
+    title: "Stay & Play",
+    summary: "Relaxed drop-in play sessions for little ones and their grown-ups.",
+    ageBands: ["little-ones", "explorers"],
+    heroImage: placeholderImage("cfc-stayplay", "Toddlers at a stay-and-play session"),
+  },
+  {
+    slug: "forest-school",
+    title: "Forest School",
+    summary: "Outdoor, nature-based learning that builds confidence and curiosity.",
+    ageBands: ["explorers", "big-kids"],
+    heroImage: placeholderImage("cfc-forest", "Children at forest school"),
+  },
+  {
+    slug: "homeschool-hub",
+    title: "Homeschool Hub",
+    summary: "A warm learning community for homeschooling families.",
+    ageBands: ["explorers", "big-kids"],
+    heroImage: placeholderImage("cfc-homeschool", "Homeschool hub learning session"),
+  },
+  {
+    slug: "creative-arts",
+    title: "Creative Arts",
+    summary: "Hands-on art, music, and making for curious minds.",
+    ageBands: ["explorers", "big-kids"],
+    heroImage: placeholderImage("cfc-arts", "Children making art"),
+  },
 ];
 
+/**
+ * Full program records for the Programs index + detail pages. Only the four
+ * programs confirmed on the live CFC site are included; their benefits and
+ * activities are intrinsic to each program type (not invented specifics).
+ * Schedules, pricing, ratios and a "day in the life" are left empty as CMS
+ * placeholders — those are operational details we won't invent.
+ */
+const programGallery = (slug: string) =>
+  Array.from({ length: 3 }, (_, i) =>
+    placeholderImage(`${slug}-g${i + 1}`, `Conscious Family Centre — ${slug} ${i + 1}`),
+  );
+
+const emptyProgramLogistics = {
+  body: [] as Program["body"],
+  dayInTheLife: [] as Program["dayInTheLife"],
+  pricing: [] as Program["pricing"],
+  whatToBring: [] as string[],
+  faqs: [] as FaqItem[],
+};
+
+export const programs: Program[] = [
+  {
+    slug: "stay-and-play",
+    title: "Stay & Play",
+    type: "stay-and-play",
+    ageBands: ["little-ones", "explorers"],
+    summary: "Relaxed, drop-in play sessions for little ones and their grown-ups.",
+    heroImage: placeholderImage("cfc-stayplay", "Toddlers and carers at a stay-and-play session"),
+    learningExperience:
+      "Unhurried mornings of open-ended play, where babies and toddlers explore at their own pace alongside a trusted grown-up — and parents find a warm, welcoming community.",
+    keyBenefits: [
+      "Builds early confidence in a gentle setting",
+      "Time for parents and carers to connect",
+      "Sensory, open-ended play",
+    ],
+    typicalActivities: ["Free play and exploration", "Sensory and messy play", "Songs and story time", "Outdoor garden play"],
+    gallery: programGallery("stayplay"),
+    cta: { label: "Book a Visit", href: "/contact", variant: "primary" },
+    seo: {
+      title: "Stay & Play — Drop-in Play Sessions in Wuse 2",
+      description: "Relaxed drop-in play sessions for babies and toddlers and their grown-ups at Conscious Family Centre, Wuse 2, Abuja.",
+    },
+    order: 1,
+    ...emptyProgramLogistics,
+  },
+  {
+    slug: "forest-school",
+    title: "Forest School",
+    type: "forest-school",
+    ageBands: ["explorers", "big-kids"],
+    summary: "Outdoor, nature-based learning that builds confidence and curiosity.",
+    heroImage: placeholderImage("cfc-forest", "Children exploring at forest school"),
+    learningExperience:
+      "Child-led days in the open air, where children take safe risks, follow their curiosity, and build a deep connection with the natural world.",
+    keyBenefits: [
+      "Confidence through safe, real challenges",
+      "A genuine connection with nature",
+      "Independence and resilience",
+    ],
+    typicalActivities: ["Outdoor exploration", "Nature crafts", "Free play in the garden", "Seasonal discovery"],
+    gallery: programGallery("forest"),
+    cta: { label: "Book a Visit", href: "/contact", variant: "primary" },
+    seo: {
+      title: "Forest School — Nature-Based Learning in Abuja",
+      description: "Outdoor, nature-based forest school for children in Wuse 2, Abuja — building confidence, curiosity and a love of the natural world.",
+    },
+    order: 2,
+    ...emptyProgramLogistics,
+  },
+  {
+    slug: "homeschool-hub",
+    title: "Homeschool Hub",
+    type: "homeschool-hub",
+    ageBands: ["explorers", "big-kids"],
+    summary: "A warm learning community for homeschooling families.",
+    heroImage: placeholderImage("cfc-homeschool", "Children learning together at the homeschool hub"),
+    learningExperience:
+      "A supportive home base for homeschooling families — where children learn together, make friends, and grow within a community that shares the journey.",
+    keyBenefits: [
+      "Community and friendship for homeschoolers",
+      "Shared, social learning",
+      "Support for the whole family",
+    ],
+    typicalActivities: ["Group learning sessions", "Collaborative projects", "Enrichment activities", "Outdoor play"],
+    gallery: programGallery("homeschool"),
+    cta: { label: "Register Interest", href: "/contact", variant: "primary" },
+    seo: {
+      title: "Homeschool Hub — A Learning Community in Abuja",
+      description: "A warm, supportive homeschool community in Wuse 2, Abuja, where children learn together and families find connection.",
+    },
+    order: 3,
+    ...emptyProgramLogistics,
+  },
+  {
+    slug: "creative-arts",
+    title: "Creative Arts",
+    type: "creative-arts",
+    ageBands: ["explorers", "big-kids"],
+    summary: "Hands-on art, music, and making for curious minds.",
+    heroImage: placeholderImage("cfc-arts", "Children making art at Conscious Family Centre"),
+    learningExperience:
+      "Joyful, hands-on sessions where children express themselves through art, music and making — process over product, imagination over instruction.",
+    keyBenefits: ["Creativity and self-expression", "Fine-motor and sensory development", "Joyful, process-led making"],
+    typicalActivities: ["Painting and drawing", "Music and movement", "Crafts and making", "Imaginative play"],
+    gallery: programGallery("arts"),
+    cta: { label: "Book a Visit", href: "/contact", variant: "primary" },
+    seo: {
+      title: "Creative Arts — Art, Music & Making for Children",
+      description: "Hands-on creative arts sessions — art, music and making — for children at Conscious Family Centre, Wuse 2, Abuja.",
+    },
+    order: 4,
+    ...emptyProgramLogistics,
+  },
+];
+
+// CMS placeholder — replace with the real camp + pricing/images in Studio.
+export const featuredCamps: CampSession[] = [
+  {
+    slug: "summer-steam-camp-2026",
+    title: "Summer STEAM Holiday Camp",
+    season: "Summer 2026",
+    theme: "STEAM & Nature",
+    ageBand: "Ages 4–10",
+    startDate: "2026-08-03",
+    endDate: "2026-08-14",
+    dailySchedule: "9:00 – 14:00, Monday to Friday",
+    capacity: 30,
+    spotsRemaining: 8,
+    priceNGN: 0, // placeholder — set real pricing in CMS
+    included: ["STEAM projects", "Forest-school sessions", "Creative arts", "Daily outdoor play"],
+    packingList: [],
+    status: "open",
+    heroImage: placeholderImage("cfc-camp", "Children at summer holiday camp"),
+    seo: { title: "Summer STEAM Holiday Camp", description: "STEAM and nature holiday camp for children 4–10 in Abuja." },
+  },
+];
+
+// CMS placeholders — replace with real, consented testimonials in Studio.
 export const testimonials: Testimonial[] = [
   {
-    quote:
-      "The booth was the most photographed corner of our wedding after the altar. Sarai understood the assignment — it looked like it belonged in the room.",
-    author: "Alexandra & James",
-    event: "Wedding — Oheka Castle, Huntington",
+    quote: "A short, heartfelt quote from a parent will appear here once added in the CMS.",
+    authorName: "Parent name",
+    childAge: "Parent of a 4-year-old",
   },
   {
-    quote:
-      "Our guests are still talking about the 360 experience. Flawless setup, attendants in black tie, and the gallery arrived before our flight home.",
-    author: "Priya Raman",
-    event: "Private Estate Celebration — Southampton",
+    quote: "Add a second parent testimonial in Studio — names and consent on file.",
+    authorName: "Parent name",
+    childAge: "Parent of a 6-year-old",
   },
   {
-    quote:
-      "We've used every activation vendor in the city. Sarai is the only one I'd put in front of our C-suite without a second thought.",
-    author: "Daniel Okafor",
-    event: "Corporate Gala — Manhattan",
-  },
-  {
-    quote:
-      "From the first call to the final print, everything felt considered. It elevated the entire evening — our planner now books them for every event.",
-    author: "The Castellano Family",
-    event: "50th Anniversary — Garden City",
+    quote: "A third testimonial placeholder, ready to be replaced with real words.",
+    authorName: "Parent name",
+    childAge: "Parent of a 2-year-old",
   },
 ];
 
-/* ────────────────────────── Services ────────────────────────── */
+/* ── Gallery ───────────────────────────────────────────────────── */
 
-export const services: Service[] = [
+// Category taxonomy grounded in CFC's identity (labels, not invented events).
+export const galleryCategories: GalleryCategory[] = [
+  { slug: "learning", title: "Learning", description: "Curiosity, discovery, and learning through play.", order: 1 },
+  { slug: "nature", title: "Nature", description: "Forest school, garden play, and time outdoors.", order: 2 },
+  { slug: "creativity", title: "Creativity", description: "Art, music, and making.", order: 3 },
+  { slug: "community", title: "Community", description: "Families and friendships growing together.", order: 4 },
+  { slug: "camps", title: "Camps", description: "Holiday camp adventures.", order: 5 },
+];
+
+/**
+ * Placeholder gallery images for future uploads (per the content rule — no
+ * stock or fake photography presented as real). Each is clearly labelled and
+ * assigned a category so the filter/search/lightbox experience is fully
+ * demonstrable; editors replace these with real CFC photos in Studio.
+ */
+export const galleryItems: GalleryItem[] = Array.from({ length: 12 }, (_, i) => {
+  const category = galleryCategories[i % galleryCategories.length];
+  return {
+    image: placeholderImage(`cfc-gallery-${i + 1}`, `Conscious Family Centre — ${category.title.toLowerCase()} (placeholder ${i + 1})`),
+    title: `${category.title} moment`,
+    slug: `placeholder-${i + 1}`,
+    caption: `A ${category.title.toLowerCase()} moment at Conscious Family Centre.`,
+    category,
+    tags: [category.slug, "placeholder"],
+    featured: i < 3,
+    order: i,
+  };
+});
+
+// Immersive visual stories (evergreen, identity-based — not specific events).
+export const featuredStories: FeaturedStory[] = [
   {
-    slug: "photo-booth-rentals",
-    eyebrow: "01 — The Signature Booth",
-    title: "Photo Booth Rentals",
-    shortDescription:
-      "An open-air studio with editorial lighting, museum-grade prints, and a presence that belongs in the room.",
+    slug: "a-day-in-nature",
+    title: "A day rooted in nature.",
     description:
-      "Our signature booth is closer to a portrait studio than a party rental. Glass-and-brass styling, professional strobe lighting, and backdrops curated to your event's palette. Guests leave with archival prints designed like gallery cards — your monogram, your typography, your evening.",
-    features: [
-      "Open-air studio with professional strobe lighting",
-      "Curated backdrop library or fully custom set design",
-      "Archival matte prints with bespoke design",
-      "Black-tie attendants for the full engagement",
-      "Instant text & email delivery, full online gallery in 48 hours",
+      "From muddy mornings in the garden to quiet moments under the trees, our days are shaped by the outdoors — where children explore, take safe risks, and grow in confidence.",
+    images: [
+      placeholderImage("cfc-story-nature-1", "Children exploring outdoors at Conscious Family Centre"),
+      placeholderImage("cfc-story-nature-2", "A child discovering nature in the garden"),
     ],
-    image: u("photo-1492684223066-81342ee5ff30"),
-    imageAlt: "Guests celebrating with sparklers in dramatic evening light",
-  },
-  {
-    slug: "360-booth-experiences",
-    eyebrow: "02 — The 360 Experience",
-    title: "360 Booth Experiences",
-    shortDescription:
-      "Slow-motion, cinematic video captured in the round — the moment your dance floor becomes a film set.",
-    description:
-      "A platform, a revolving cinema camera, and lighting designed for motion. The 360 experience turns thirty seconds into a cinematic keepsake — slowed, graded, scored, and delivered to each guest's phone before the night ends. It is, reliably, where the line forms.",
-    features: [
-      "Cinematic 120fps capture with professional motion lighting",
-      "Custom motion graphics, color grade & licensed audio",
-      "Instant delivery to guests via text or QR",
-      "LED ambient staging matched to your design",
-      "Dedicated experience director on site",
-    ],
-    image: u("photo-1470229722913-7c0e2dbbafd3"),
-    imageAlt: "Hands raised under dramatic stage lighting at an event",
-  },
-  {
-    slug: "weddings",
-    eyebrow: "03 — Weddings",
-    title: "Weddings",
-    shortDescription:
-      "Designed alongside your planner and florist, so the experience feels like part of the wedding — not parked at it.",
-    description:
-      "We treat your wedding like the once-in-a-lifetime production it is. In the months before, we work with your planner on placement, palette, florals, and print design. On the day, our team arrives early, dresses formally, and disappears into the rhythm of your celebration — leaving behind a guest book of real moments.",
-    features: [
-      "Design consultation with your planner & stationer",
-      "Print suites matched to your invitation typography",
-      "Velvet guest book service with handwritten notes",
-      "Ceremony-to-last-dance coverage options",
-      "Heirloom gallery box with archival prints",
-    ],
-    image: u("photo-1583939003579-730e3918a45a"),
-    imageAlt: "Bride and groom sharing a kiss at golden hour",
-  },
-  {
-    slug: "corporate-events",
-    eyebrow: "04 — Corporate Events",
-    title: "Corporate Events",
-    shortDescription:
-      "Brand activations with the polish of your identity — galas, launches, summits, and holiday celebrations.",
-    description:
-      "Your brand has guidelines; we read them. Sarai corporate experiences are built to spec — branded sets, on-palette lighting, data capture that your marketing team will actually use, and a presence polished enough for clients, press, and leadership in the same frame.",
-    features: [
-      "Fully branded set design & print collateral",
-      "Custom overlays, microsites & instant social sharing",
-      "Lead capture & post-event analytics reporting",
-      "COI, vendor compliance & venue coordination handled",
-      "National multi-city activation capability",
-    ],
-    image: u("photo-1511578314322-379afb476865"),
-    imageAlt: "Elegant corporate gala with ambient lighting and formal tables",
-  },
-  {
-    slug: "private-celebrations",
-    eyebrow: "05 — Private Celebrations",
-    title: "Private Celebrations",
-    shortDescription:
-      "Milestone birthdays, anniversaries, galas at home — intimate events with full production values.",
-    description:
-      "Some of our favorite evenings happen in living rooms, gardens, and private clubs. For milestone celebrations we scale the full Sarai experience to intimate settings — discreet footprints, refined styling, and keepsakes that feel personal because they are.",
-    features: [
-      "Site visits for private residences & clubs",
-      "Discreet, low-footprint installations",
-      "Personalized print design around the guest of honor",
-      "Same-night digital gallery for hosts",
-      "White-glove setup & breakdown, invisible to guests",
-    ],
-    image: u("photo-1530103862676-de8c9debad1d"),
-    imageAlt: "Confetti falling over a joyful private celebration",
+    cta: { label: "Explore Programs", href: "/programs", variant: "ghost" },
   },
 ];
 
-export const servicesPage: ServicesPageContent = {
-  processSection: {
-    eyebrow: "How It Works",
-    titleLines: ["From first call", "to final keepsake."],
+/* ── FAQ ───────────────────────────────────────────────────────── */
+
+// CMS-managed category taxonomy (labels, not invented content).
+export const faqCategories: FaqCategoryDoc[] = [
+  { slug: "general", title: "General", description: "The essentials — ages, hours, and location.", displayOrder: 1 },
+  { slug: "programs", title: "Programs", description: "About our programs and how to take part.", displayOrder: 2 },
+  { slug: "philosophy", title: "Learning Philosophy", description: "How and why children learn here.", displayOrder: 3 },
+  { slug: "participation", title: "Family Participation", description: "How families take part day to day.", displayOrder: 4 },
+  { slug: "enrollment", title: "Enrollment", description: "Getting started at the centre.", displayOrder: 5 },
+  { slug: "camps", title: "Camps", description: "Holiday camp and registration.", displayOrder: 6 },
+  { slug: "safety", title: "Safety", description: "Looking after your child.", displayOrder: 7 },
+];
+
+// Factual general FAQs derived from the live site (ages, hours, location, booking).
+export const generalFaqs: FaqItem[] = [
+  { question: "What ages do you cater for?", answer: "We welcome children from birth to age 10 across our programs.", category: "general", featured: true, popular: true, order: 1 },
+  { question: "What are your opening hours?", answer: "We're open Monday to Saturday, 10:00–15:00, and closed on Sundays.", category: "general", featured: true, order: 2 },
+  { question: "Where are you located?", answer: "Inside BMT Garden, opposite Legacy Centre, Wuse 2, Abuja.", category: "general", featured: true, popular: true, order: 3 },
+  { question: "Do I need to book in advance?", answer: "Yes — we recommend booking ahead, as places are limited.", category: "general", order: 4 },
+];
+
+// Program-specific FAQs (factual; admissions / ages / schedules / participation).
+export const programFaqs: FaqItem[] = [
+  { question: "Which programs are right for my child's age?", answer: "We welcome children from birth to age 10. Stay & Play suits our youngest, while Forest School, Homeschool Hub and Creative Arts are designed for older explorers and big kids.", category: "programs", popular: true, order: 1 },
+  { question: "How do I join a program?", answer: "The best first step is to book a visit so you can see the centre and meet us. We'll help you find the right fit and explain how to get started.", category: "programs", featured: true, order: 2 },
+  { question: "Do you offer drop-in or regular sessions?", answer: "Stay & Play runs as relaxed drop-in sessions. Our other programs run on a regular basis — get in touch for current schedules, as places are limited.", category: "programs", order: 3 },
+  { question: "Where do the programs take place?", answer: "All programs run from our home inside BMT Garden, opposite Legacy Centre in Wuse 2, Abuja, with plenty of outdoor space.", category: "programs", order: 4 },
+];
+
+// Learning-philosophy FAQs (true to the centre's stated identity — not invented claims).
+export const philosophyFaqs: FaqItem[] = [
+  { question: "What is your learning philosophy?", answer: "We believe children learn best through play and time in nature, supported by a community that cares for the whole family. Our days are child-led and unhurried.", category: "philosophy", featured: true, popular: true, order: 1 },
+  { question: "Do you follow a fixed curriculum?", answer: "Rather than a fixed curriculum, we follow each child's curiosity — creating the conditions for confidence, creativity, and connection to grow at their own pace.", category: "philosophy", order: 2 },
+];
+
+// Family-participation FAQs (factual — stay-and-play and homeschool support are real).
+export const participationFaqs: FaqItem[] = [
+  { question: "Can I stay with my child?", answer: "Yes — our Stay & Play sessions are relaxed, drop-in mornings where little ones explore alongside a trusted grown-up.", category: "participation", order: 1 },
+  { question: "Do you support homeschooling families?", answer: "Yes. Our Homeschool Hub is a warm community where homeschooling families learn together and find connection and support.", category: "participation", popular: true, order: 2 },
+];
+
+// Enrollment FAQ — honest pointer, no invented requirements/fees.
+export const enrollmentFaqs: FaqItem[] = [
+  { question: "How do I get started?", answer: "The best first step is to book a visit. We'll show you around, answer your questions, and help you find the right fit for your family.", category: "enrollment", featured: true, order: 1 },
+];
+
+// Camp FAQs — CMS placeholders (no invented dates, fees, or policies).
+export const campFaqs: FaqItem[] = [
+  { question: "How does Summer Camp registration work?", answer: "Registration for our Summer Camp is open and places are limited. Full details will be confirmed here — please contact us for the latest information.", category: "camps", featured: true, order: 1 },
+  { question: "What ages is camp for?", answer: "Camp details, including age groups and availability, are managed in our CMS and confirmed each season. Contact us for current details.", category: "camps", order: 2 },
+];
+
+// Safety FAQ — placeholder pointer (no invented policies/claims).
+export const safetyFaqs: FaqItem[] = [
+  { question: "How do you keep children safe?", answer: "Your child's wellbeing is our priority. We're happy to talk through our approach in person — please book a visit or contact us.", category: "safety", order: 1 },
+];
+
+/** Combined FAQ set used by the FAQ page (CMS replaces this wholesale). */
+export const allFaqs: FaqItem[] = [
+  ...generalFaqs,
+  ...programFaqs,
+  ...philosophyFaqs,
+  ...participationFaqs,
+  ...enrollmentFaqs,
+  ...campFaqs,
+  ...safetyFaqs,
+];
+
+/* ── FAQ page ──────────────────────────────────────────────────── */
+
+export const faqPageContent: FaqPageContent = {
+  hero: {
+    eyebrow: "FAQ",
+    title: "Questions, thoughtfully answered.",
+    intro: "Everything you need to know about life at Conscious Family Centre — search, or browse by topic.",
+    image: placeholderImage("cfc-faq-hero", "A warm moment at Conscious Family Centre"),
   },
-  processSteps: [
-    {
-      number: "01",
-      title: "The Conversation",
-      description:
-        "A short call about your event, your venue, and what you want guests to feel. We hold your date for seven days while we design.",
-    },
-    {
-      number: "02",
-      title: "The Design",
-      description:
-        "We compose the experience — booth styling, backdrop, lighting, and print suite — and present it as a visual proposal alongside your planner.",
-    },
-    {
-      number: "03",
-      title: "The Evening",
-      description:
-        "Our team arrives hours early, builds quietly, and runs the experience in black tie. You never think about us once. That's the point.",
-    },
-    {
-      number: "04",
-      title: "The Keepsake",
-      description:
-        "Within 48 hours, your complete gallery arrives — retouched, organized, and ready to relive. Heirloom print boxes follow by courier.",
-    },
-  ],
+  featured: {
+    eyebrow: "Most asked",
+    heading: "Popular questions.",
+    intro: "The questions families ask us most.",
+  },
+  browse: {
+    eyebrow: "Browse",
+    heading: "Find your answer.",
+    intro: "Filter by topic or search for a specific question.",
+  },
+  support: {
+    eyebrow: "Still have questions?",
+    heading: "We're here to help.",
+    body: "Can't find what you're looking for? We'd love to hear from you — come and visit, or get in touch.",
+    ctas: [
+      { label: "Contact Us", href: "/contact", variant: "primary" },
+      { label: "Book a Visit", href: "/contact", variant: "ghost" },
+      { label: "Register for Camp", href: "/camp-registration", variant: "secondary" },
+    ],
+  },
+  finalCta: {
+    eyebrow: "Come and see",
+    heading: "The best answer is a visit.",
+    body: "Come and feel the atmosphere for yourself in Wuse 2, Abuja.",
+    ctas: [
+      { label: "Book a Visit", href: "/contact", variant: "primary" },
+      { label: "Explore Programs", href: "/programs", variant: "ghost" },
+      { label: "Contact Us", href: "/contact", variant: "secondary" },
+    ],
+  },
   seo: {
-    title: "Services — Luxury Photo Booth Rentals, 360 Experiences & More",
+    title: "FAQ — Answers for Families",
     description:
-      "Signature photo booth rentals, cinematic 360 experiences, weddings, corporate activations, and private celebrations across Long Island, the Hamptons, and NYC.",
+      "Answers to common questions about Conscious Family Centre in Wuse 2, Abuja — programs, ages, philosophy, family participation, camps and more.",
+    keywords: [
+      "family learning centre FAQ Abuja",
+      "conscious education questions",
+      "forest school FAQ",
+      "children's programs Wuse 2",
+    ],
   },
 };
 
-/* ────────────────────────── About page ────────────────────────── */
+/* ── Programs page ─────────────────────────────────────────────── */
 
-export const aboutPage: AboutPageContent = {
-  story: {
-    eyebrow: "Our Story",
-    titleLines: ["From one Long Island", "wedding to three", "hundred and fifty."],
+export const programsPageContent: ProgramsPageContent = {
+  hero: {
+    eyebrow: "Our programs",
+    title: "Learning that follows the child.",
+    intro:
+      "From relaxed stay-and-play mornings to forest-school adventures, every program is built around play, nature, and the whole family — for children from birth to age 10.",
+    image: placeholderImage("cfc-programs-hero", "Children exploring across Conscious Family Centre's programs"),
+    primaryCta: { label: "Book a Visit", href: "/contact", variant: "primary" },
+    secondaryCta: { label: "Register Interest", href: "/contact", variant: "ghost" },
+  },
+  overview: {
+    eyebrow: "Our approach",
+    heading: "One philosophy, many ways to grow.",
     paragraphs: [
-      "Sarai began the way the best things do — at a wedding. Watching guests crowd around a tired, fluorescent-lit booth in the corner of an otherwise breathtaking room, our founder asked a question no one in the industry seemed to be asking: why is the most-visited corner of the event the least designed?",
-      "We spent a year answering it. Studio lighting instead of ring lights. Archival prints instead of glossy strips. Attendants who dress like guests, not staff. Backdrops composed with the florist, not shipped from a warehouse. The result was a photographic experience that belonged in the rooms it stood in — and Long Island's planners noticed.",
-      "Today Sarai serves the weddings, brands, and families of Long Island, the Hamptons, and New York City. We remain deliberately small, deliberately obsessive, and deliberately booked by people who care about the details no one else sees.",
+      "Every program at Conscious Family Centre shares the same roots: children learn best through play, through time in nature, and within a community that cares for the whole family.",
+      "Rather than a fixed curriculum, we follow each child's curiosity — creating the conditions for confidence, creativity, and connection to grow at their own pace.",
     ],
-    image: u("photo-1522673607200-164d1b6ce486"),
-    imageAlt: "Champagne toast between guests at a refined celebration",
-    secondImage: u("photo-1519167758481-83f550bb49b3"),
-    secondImageAlt: "A grand ballroom dressed for a luxury wedding",
+    image: placeholderImage("cfc-programs-overview", "A child absorbed in play at Conscious Family Centre"),
   },
-  pillarsSection: {
-    eyebrow: "What We Believe",
-    titleLines: ["Standards that don't", "scale down."],
+  outcomes: {
+    eyebrow: "Why our programs matter",
+    heading: "What children carry with them.",
+    intro: "Across every program, we nurture the qualities that matter long after childhood.",
+    cards: [
+      { title: "Confidence", description: "Safe, real challenges that help children believe in themselves.", icon: "sprout" },
+      { title: "Creativity", description: "Open-ended play and making that put imagination first.", icon: "sun" },
+      { title: "Curiosity", description: "Child-led days that protect the instinct to wonder and explore.", icon: "compass" },
+      { title: "Connection", description: "Friendship, family, and a real sense of belonging.", icon: "leaf" },
+      { title: "Independence", description: "Room to try, to choose, and to grow at their own pace.", icon: "sprout" },
+    ],
   },
-  pillars: [
-    {
-      title: "Design before equipment",
-      description:
-        "We start with how the experience should look in your room and build backward. The hardware is invisible; the moment is everything.",
-    },
-    {
-      title: "Hospitality, not staffing",
-      description:
-        "Our attendants are trained hosts. They welcome, style, and direct like portrait photographers — because they are.",
-    },
-    {
-      title: "Keepsakes, not output",
-      description:
-        "Prints on archival stock, galleries graded like editorials, boxes designed to be opened on anniversaries. We make heirlooms.",
-    },
-    {
-      title: "Precision, always",
-      description:
-        "Load-in schedules to the minute, COIs before they're requested, backups for the backups. Luxury is reliability.",
-    },
-  ],
-  closing: {
-    eyebrow: "The People",
-    titleLines: ["A small team with", "impossible standards."],
-    body: "Sarai is run by a tight ensemble of photographers, designers, and event professionals who have worked the most demanding rooms in New York. We take a limited number of events each season — when we're at your event, we are entirely at your event.",
+  experience: {
+    eyebrow: "Learning through experience",
+    heading: "How learning happens here.",
+    intro: "Less sitting still, more getting stuck in.",
+    items: [
+      { title: "Nature learning", description: "Forest school, garden play, and weekly excursions keep the outdoors central.", icon: "leaf" },
+      { title: "Creative exploration", description: "Art, music, and making, led by each child's imagination.", icon: "sun" },
+      { title: "Family engagement", description: "We support parents, carers, and homeschoolers — not just children.", icon: "compass" },
+      { title: "Community connection", description: "A warm hub where families and friendships grow together.", icon: "sprout" },
+    ],
+  },
+  gallery: {
+    eyebrow: "In our programs",
+    heading: "Moments from our days.",
+    intro: "Muddy boots, big ideas, and plenty of joy.",
+  },
+  faq: {
+    eyebrow: "Good to know",
+    heading: "Program questions, answered.",
+  },
+  testimonials: {
+    eyebrow: "Loved by our families",
+    heading: "What parents say.",
+  },
+  finalCta: {
+    eyebrow: "Take the next step",
+    heading: "Find the right program for your child.",
+    body: "Visit us in Wuse 2, ask us anything, or secure a place at Summer Camp.",
+    ctas: [
+      { label: "Book a Visit", href: "/contact", variant: "primary" },
+      { label: "Contact Us", href: "/contact", variant: "ghost" },
+      { label: "Register for Summer Camp", href: "/camp-registration", variant: "secondary" },
+    ],
   },
   seo: {
-    title: "About — Sarai Photo Booth",
+    title: "Programs — Play, Nature & Learning for Children 0–10",
     description:
-      "The story and standards behind Long Island's luxury photo booth house. Design before equipment, hospitality before staffing, heirlooms before output.",
+      "Explore Conscious Family Centre's programs in Wuse 2, Abuja: Stay & Play, Forest School, Homeschool Hub and Creative Arts — play-based, nature-connected learning for children from birth to age 10.",
+    keywords: [
+      "children's programs Abuja",
+      "forest school Wuse 2",
+      "stay and play Abuja",
+      "homeschool hub Abuja",
+      "creative arts for children Abuja",
+    ],
   },
 };
 
-/* ────────────────────────── FAQ ────────────────────────── */
+/* ── Contact page ──────────────────────────────────────────────── */
 
-export const faqItems: FaqItem[] = [
-  {
-    category: "Booking",
-    question: "How far in advance should we book?",
-    answer:
-      "For peak wedding season (May through October) we recommend reserving 9–12 months ahead — we accept a limited number of events per weekend. Corporate events and private celebrations can often be accommodated with 4–8 weeks' notice, and we keep a short list for last-minute requests.",
+export const contactPageContent: ContactPageContent = {
+  hero: {
+    eyebrow: "Contact us",
+    title: "Let's start a conversation.",
+    intro:
+      "Whether you have a question, want to book a visit, or are ready to get started — we'd love to hear from you. Reaching out is the first step into our community.",
+    image: placeholderImage("cfc-contact-hero", "A warm welcome at Conscious Family Centre"),
   },
-  {
-    category: "Booking",
-    question: "What is required to reserve our date?",
-    answer:
-      "A signed agreement and a 50% retainer secure your date exclusively. The balance is due 14 days before your event. We accept all major cards, ACH, and checks, and we'll hold a tentative date for seven days while you decide.",
+  welcome: {
+    eyebrow: "We're glad you're here",
+    heading: "However you'd like to reach us.",
+    paragraphs: [
+      "Every message reaches a real person who cares about your family. Share as much or as little as you like — we'll take it from there.",
+      "Once you get in touch, we'll reply personally to answer your questions and, when you're ready, help you arrange a visit to see the centre for yourself.",
+    ],
   },
-  {
-    category: "Booking",
-    question: "Do you travel beyond Long Island?",
-    answer:
-      "Yes. We're based on Long Island and regularly serve the Hamptons, New York City, Westchester, and northern New Jersey. Travel within 50 miles of Garden City is included; beyond that, a transparent travel fee is quoted up front. Multi-city corporate activations are available nationally.",
+  form: {
+    eyebrow: "Send a message",
+    heading: "Tell us a little about your family.",
+    intro: "Fill in the form and we'll be in touch. Fields marked with * are required.",
   },
-  {
-    category: "The Experience",
-    question: "What makes Sarai different from a typical photo booth rental?",
-    answer:
-      "Design and hospitality. Our installations are styled to your event — lighting, backdrop, and print design composed with your planner — and run by formally dressed attendants trained as portrait hosts. The result photographs like part of your event, not a vendor parked at it.",
+  visit: {
+    eyebrow: "Come and see",
+    heading: "Nothing beats a visit.",
+    description:
+      "The best way to feel whether Conscious Family Centre is right for your family is to spend a little time with us.",
+    benefits: [
+      "See our nature-connected spaces in Wuse 2",
+      "Meet the people who'll care for your child",
+      "Watch play-based learning in action",
+      "Ask every question on your mind",
+    ],
+    cta: { label: "Book a Visit", href: "/contact", variant: "primary" },
   },
-  {
-    category: "The Experience",
-    question: "How does the 360 booth work?",
-    answer:
-      "Guests step onto a low platform while a cinema camera revolves around them, capturing slow-motion video at 120 frames per second. Each clip is automatically graded, set to licensed music, branded to your event, and delivered to the guest's phone within seconds.",
+  journey: {
+    eyebrow: "Getting started",
+    heading: "Your journey with us.",
+    intro: "Four simple steps from first hello to feeling at home.",
+    steps: [
+      { title: "Contact us", description: "Send a message or give us a call — tell us about your family." },
+      { title: "Book a visit", description: "Come and experience the centre and meet our team." },
+      { title: "Meet our team", description: "We'll help you find the right program for your child." },
+      { title: "Join the community", description: "Welcome — your family becomes part of ours." },
+    ],
   },
-  {
-    category: "The Experience",
-    question: "Can we customize the prints and digital templates?",
-    answer:
-      "Always — it's our favorite part. Every event receives a bespoke print suite designed around your invitation typography, monogram, or brand guidelines. You'll approve the design in a proof round before the event; nothing goes to print without your sign-off.",
+  camp: {
+    eyebrow: "Holiday camp",
+    heading: "Summer Camp registration is open.",
+    description:
+      "A holiday of STEAM projects, forest-school adventures, and creative play. Places are limited.",
+    availabilityNote: "Places are limited — register early to secure your child's spot.",
+    cta: { label: "Register for Summer Camp", href: "/camp-registration", variant: "secondary" },
   },
-  {
-    category: "The Experience",
-    question: "How quickly do guests receive their photos?",
-    answer:
-      "Instantly. Prints emerge in under ten seconds, and digital copies are texted or emailed to guests in real time. Your complete retouched gallery is delivered within 48 hours of the event.",
+  faq: {
+    eyebrow: "Quick answers",
+    heading: "Before you ask.",
   },
-  {
-    category: "Logistics",
-    question: "How much space and power do you need?",
-    answer:
-      "The signature booth needs roughly 10×10 feet; the 360 experience is best with 12×12 feet for comfortable guest flow. Each requires one standard 120V outlet within 25 feet. We carry professional cable management, so the installation stays clean and safe.",
-  },
-  {
-    category: "Logistics",
-    question: "Are you insured? Our venue requires a COI.",
-    answer:
-      "Fully. We carry $2M in general liability coverage and issue certificates of insurance directly to your venue, usually the same business day. We've worked with most major Long Island, Hamptons, and Manhattan venues and know their requirements well.",
-  },
-  {
-    category: "Logistics",
-    question: "When do you set up and break down?",
-    answer:
-      "We arrive 2–3 hours before guest arrival and complete a full lighting and print test before doors open. Breakdown happens after your event concludes or during a moment your planner designates — quietly, and never during speeches or the last dance.",
-  },
-  {
-    category: "Logistics",
-    question: "Can the booth operate outdoors?",
-    answer:
-      "Yes, with conditions we'll confirm in advance: level ground, overhead cover (tent or structure), and access to power. For tented estate weddings and garden parties, we conduct a site visit to plan placement and lighting precisely.",
-  },
-  {
-    category: "Customization",
-    question: "Do you offer branded experiences for corporate events?",
-    answer:
-      "It's one of our specialties. We build fully branded activations — custom set design, on-palette lighting, branded overlays and microsites, lead capture, and post-event analytics. Send us your brand guidelines and we'll return a visual proposal.",
-  },
-];
-
-export const faqPage: FaqPageContent = {
-  sideNote: {
-    eyebrow: "Still Curious?",
-    title: "Ask us anything — we answer within one business day.",
-    ctaLabel: "Start the Conversation",
+  finalCta: {
+    eyebrow: "We can't wait to meet you",
+    heading: "Your family belongs here.",
+    body: "Reach out, book a visit, or explore our programs — whatever feels right for you.",
+    ctas: [
+      { label: "Contact Us", href: "/contact", variant: "primary" },
+      { label: "Book a Visit", href: "/contact", variant: "ghost" },
+      { label: "Explore Programs", href: "/programs", variant: "secondary" },
+    ],
   },
   seo: {
-    title: "FAQ — Sarai Photo Booth",
+    title: "Contact Us — Visit Our Family Learning Centre in Abuja",
     description:
-      "Booking timelines, logistics, customization, insurance, and everything else you'd like to know before reserving your date with Sarai.",
+      "Get in touch with Conscious Family Centre in Wuse 2, Abuja. Ask a question, book a visit, or register interest — a nature-connected learning community for children 0–10.",
+    keywords: [
+      "contact family learning centre Abuja",
+      "book a visit Wuse 2",
+      "preschool contact Abuja",
+      "nature-based learning enquiry",
+    ],
   },
 };
 
-/* ────────────────────────── Contact ────────────────────────── */
+/* ── Gallery page ──────────────────────────────────────────────── */
 
-export const contactContent: ContactContent = {
-  eyebrow: "Reserve Your Date",
-  titleLines: ["Let's design", "your evening."],
-  body: "Tell us about your event — the date, the venue, the feeling you're after. We respond within one business day with availability and a tailored proposal.",
-  image: u("photo-1465495976277-4387d4b0b4c6"),
-  imageAlt: "Bride holding a bouquet in soft natural light",
-  eventTypes: [
-    "Wedding",
-    "Corporate Event",
-    "Private Celebration",
-    "Gala / Fundraiser",
-    "Brand Activation",
-    "Other",
-  ],
-  seo: {
-    title: "Reserve Your Date — Sarai Photo Booth",
-    description:
-      "Tell us about your wedding, corporate event, or private celebration. We respond within one business day with availability and a tailored proposal.",
+export const galleryPageContent: GalleryPageContent = {
+  hero: {
+    eyebrow: "Gallery",
+    title: "Life at Conscious Family Centre.",
+    intro:
+      "A visual story of learning, exploration, creativity, and connection — the everyday moments that make our community what it is.",
+    image: placeholderImage("cfc-gallery-hero", "Children exploring and playing at Conscious Family Centre"),
   },
-};
-
-/* ────────────────────────── Shared CTA ────────────────────────── */
-
-export const ctaSection: CtaContent = {
-  eyebrow: "Limited dates each season",
-  titleLines: ["Your guests will remember", "how it felt."],
-  body: "We accept a limited number of events each season to keep every installation at our standard. If your date matters, let's hold it.",
-  ctaLabel: "Reserve Your Date",
-  ctaHref: "/contact",
-  image: u("photo-1527529482837-4698179dc6ce"),
-  imageAlt: "Moody ambient lighting washing over an evening event",
+  intro: {
+    eyebrow: "Our world, in pictures",
+    heading: "What a day here looks like.",
+    paragraphs: [
+      "We believe children learn best through play and time in nature — and these moments tell that story better than words can.",
+      "Browse our days: muddy boots and big ideas, art and music, friendships and family, and plenty of joy.",
+    ],
+  },
+  gallery: {
+    eyebrow: "Explore",
+    heading: "Moments from our days.",
+    intro: "Filter by what you'd like to see, or search for a moment.",
+  },
+  featuredMoments: {
+    eyebrow: "Featured moments",
+    heading: "A few of our favourites.",
+    intro: "Small moments that capture the spirit of the centre.",
+  },
+  community: {
+    eyebrow: "Our community",
+    heading: "More than a centre — a family.",
+    paragraphs: [
+      "Belonging is at the heart of what we do. Families find each other here over shared mornings, and children grow up surrounded by friends of every age.",
+      "There's always a reason to gather, explore, and grow together.",
+    ],
+    image: placeholderImage("cfc-gallery-community", "Families together at Conscious Family Centre"),
+  },
+  finalCta: {
+    eyebrow: "Come and see",
+    heading: "Picture your child here.",
+    body: "The best way to feel the atmosphere is to visit. Come and see us in Wuse 2.",
+    ctas: [
+      { label: "Book a Visit", href: "/contact", variant: "primary" },
+      { label: "Explore Programs", href: "/programs", variant: "ghost" },
+      { label: "Register for Camp", href: "/camp-registration", variant: "secondary" },
+    ],
+  },
+  seo: {
+    title: "Gallery — Life at Our Family Learning Centre in Abuja",
+    description:
+      "A visual story of life at Conscious Family Centre, Wuse 2, Abuja — learning, nature, creativity and community for children from birth to age 10.",
+    keywords: [
+      "family learning centre Abuja gallery",
+      "nature-based learning photos",
+      "forest school Abuja",
+      "children's learning environment Wuse 2",
+    ],
+  },
 };

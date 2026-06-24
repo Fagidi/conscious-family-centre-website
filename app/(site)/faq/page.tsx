@@ -1,61 +1,94 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getHero, getFaqItems, getFaqPage } from "@/lib/data";
-import PageHero from "@/components/shared/PageHero";
-import CtaSection from "@/components/shared/CtaSection";
-import FaqAccordion from "@/components/faq/FaqAccordion";
-import Reveal from "@/components/animation/Reveal";
+import { getFaqPageContent, getAllFaqs, getFaqCategories, getFaqs } from "@/lib/data";
+import Section from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
+import Reveal from "@/components/motion/Reveal";
+import FaqExperience from "@/components/faq/FaqExperience";
+import FaqPageAccordion from "@/components/faq/FaqPageAccordion";
+import FAQCTA from "@/components/faq/FAQCTA";
+
+// ISR so published CMS FAQ edits appear without a redeploy.
+export const revalidate = 60;
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://consciousfamilycentre.com";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seo } = await getFaqPage();
-  return { title: { absolute: seo.title }, description: seo.description };
+  const { seo } = await getFaqPageContent();
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    alternates: { canonical: "/faq" },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: `${siteUrl}/faq`,
+      type: "website",
+      ...(seo.ogImage ? { images: [{ url: seo.ogImage }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title: seo.title, description: seo.description },
+  };
 }
 
 export default async function FaqPage() {
-  const [hero, page, items] = await Promise.all([
-    getHero("faq"),
-    getFaqPage(),
-    getFaqItems(),
+  const [content, items, categories, campFaqs] = await Promise.all([
+    getFaqPageContent(),
+    getAllFaqs(),
+    getFaqCategories(),
+    getFaqs("camps"),
   ]);
+
+  // FAQPage JSON-LD from all string-answer questions (rich results / SEO).
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items
+      .filter((f) => typeof f.answer === "string")
+      .map((f) => ({
+        "@type": "Question",
+        name: f.question,
+        acceptedAnswer: { "@type": "Answer", text: f.answer as string },
+      })),
+  };
 
   return (
     <>
-      <PageHero
-        eyebrow={hero.eyebrow}
-        titleLines={hero.titleLines}
-        intro={hero.subtitle}
+      {faqSchema.mainEntity.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
+
+      <FaqExperience content={content} items={items} categories={categories} />
+
+      {campFaqs.length > 0 && (
+        <Section tone="sage" spacing="lg">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <SectionHeading
+              eyebrow="Camps"
+              title="Camp registration questions."
+              intro="Everything about our holiday camp and how to register."
+            />
+            <Reveal delay={0.05}>
+              <FaqPageAccordion items={campFaqs} idPrefix="camp" />
+            </Reveal>
+          </div>
+        </Section>
+      )}
+
+      <FAQCTA
+        eyebrow={content.support.eyebrow}
+        heading={content.support.heading}
+        body={content.support.body}
+        ctas={content.support.ctas}
+        variant="support"
       />
 
-      <section className="bg-noir py-24 md:py-36">
-        <div className="container-site grid grid-cols-1 gap-16 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <FaqAccordion items={items} />
-          </div>
-
-          {/* Side note */}
-          <aside className="lg:col-span-3 lg:col-start-10">
-            <Reveal className="lg:sticky lg:top-32">
-              <div className="border border-noir-line p-9">
-                <p className="eyebrow mb-6">{page.sideNote.eyebrow}</p>
-                <p className="font-display text-2xl font-light leading-snug">
-                  {page.sideNote.title}
-                </p>
-                <Link
-                  href="/contact"
-                  className="group mt-8 inline-flex items-center gap-3 border-b border-amethyst pb-2 text-[0.68rem] font-medium uppercase tracking-[0.28em] text-ivory transition-colors duration-500 hover:text-amethyst-bright"
-                >
-                  {page.sideNote.ctaLabel}
-                  <span aria-hidden className="transition-transform duration-500 ease-luxe group-hover:translate-x-2">
-                    →
-                  </span>
-                </Link>
-              </div>
-            </Reveal>
-          </aside>
-        </div>
-      </section>
-
-      <CtaSection />
+      <FAQCTA
+        eyebrow={content.finalCta.eyebrow}
+        heading={content.finalCta.heading}
+        body={content.finalCta.body}
+        ctas={content.finalCta.ctas}
+        variant="final"
+      />
     </>
   );
 }

@@ -1,36 +1,20 @@
-import TextReveal from "@/components/animation/TextReveal";
-import Reveal from "@/components/animation/Reveal";
+import { cn } from "@/lib/utils";
 
 interface SectionHeadingProps {
   eyebrow?: string;
-  lines: string[];
+  title: string;
+  intro?: string;
+  align?: "left" | "center";
   className?: string;
-  headingClassName?: string;
-  as?: "h1" | "h2" | "h3";
 }
 
-/**
- * Eyebrow + masked-line display headline, the recurring editorial
- * lockup used to open every section.
- */
-export default function SectionHeading({
-  eyebrow,
-  lines,
-  className = "",
-  headingClassName = "font-display text-display-md font-light",
-  as = "h2",
-}: SectionHeadingProps) {
+/** Eyebrow + display headline + optional intro — the standard section opener. */
+export default function SectionHeading({ eyebrow, title, intro, align = "left", className }: SectionHeadingProps) {
   return (
-    <div className={className}>
-      {eyebrow && (
-        <Reveal y={24} duration={1}>
-          <p className="eyebrow mb-6 flex items-center gap-4">
-            <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-            {eyebrow}
-          </p>
-        </Reveal>
-      )}
-      <TextReveal as={as} lines={lines} className={headingClassName} />
+    <div className={cn(align === "center" && "mx-auto text-center", "max-w-prose", className)}>
+      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+      <h2 className="text-display-md">{title}</h2>
+      {intro && <p className="mt-4 text-lg leading-relaxed text-bark-700/80">{intro}</p>}
     </div>
   );
 }

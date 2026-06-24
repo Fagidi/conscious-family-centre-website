@@ -1,99 +1,58 @@
 "use client";
 
-import { useRef, useState } from "react";
-import gsap from "gsap";
-import Reveal from "@/components/animation/Reveal";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { FaqItem } from "@/lib/types";
 
 /**
- * Grouped accordion with GSAP height easing. One panel open at a time;
- * generous type and hairline rules keep it editorial.
+ * Accessible FAQ accordion (disclosure pattern): button toggles an
+ * aria-controlled region; only string answers render here (Portable Text
+ * answers will use @portabletext/react when richer FAQ pages are built).
  */
 export default function FaqAccordion({ items }: { items: FaqItem[] }) {
-  const categories = Array.from(new Set(items.map((i) => i.category)));
-  const [open, setOpen] = useState<string | null>(items[0]?.question ?? null);
-  const panels = useRef(new Map<string, HTMLDivElement>());
-
-  const toggle = (question: string) => {
-    const next = open === question ? null : question;
-
-    panels.current.forEach((panel, key) => {
-      const shouldOpen = key === next;
-      gsap.to(panel, {
-        height: shouldOpen ? "auto" : 0,
-        autoAlpha: shouldOpen ? 1 : 0,
-        duration: 0.7,
-        ease: "power3.inOut",
-      });
-    });
-
-    setOpen(next);
-  };
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <div className="space-y-20">
-      {categories.map((category) => (
-        <div key={category}>
-          <Reveal>
-            <p className="eyebrow mb-8 flex items-center gap-4 text-amethyst-bright">
-              <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-              {category}
-            </p>
-          </Reveal>
-
-          <Reveal stagger={0.06}>
-            {items
-              .filter((item) => item.category === category)
-              .map((item) => {
-                const isOpen = open === item.question;
-                return (
-                  <div key={item.question} className="border-b border-noir-line">
-                    <button
-                      type="button"
-                      onClick={() => toggle(item.question)}
-                      aria-expanded={isOpen}
-                      className="group flex w-full items-baseline justify-between gap-8 py-7 text-left"
-                    >
-                      <span
-                        className={`font-display text-xl font-light transition-colors duration-500 md:text-2xl ${
-                          isOpen ? "text-amethyst-bright" : "text-ivory group-hover:text-amethyst-bright"
-                        }`}
-                      >
-                        {item.question}
-                      </span>
-                      <span
-                        aria-hidden
-                        className={`shrink-0 font-display text-2xl font-light text-ivory-dim transition-transform duration-500 ease-luxe ${
-                          isOpen ? "rotate-45 text-amethyst-bright" : ""
-                        }`}
-                      >
-                        +
-                      </span>
-                    </button>
-                    <div
-                      ref={(el) => {
-                        if (el) {
-                          panels.current.set(item.question, el);
-                          // initial state
-                          if (open !== item.question) {
-                            el.style.height = "0px";
-                            el.style.opacity = "0";
-                            el.style.visibility = "hidden";
-                          }
-                        }
-                      }}
-                      className="overflow-hidden"
-                    >
-                      <p className="max-w-2xl pb-8 text-sm font-light leading-loose text-ivory-dim">
-                        {item.answer}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-          </Reveal>
-        </div>
-      ))}
+    <div className="divide-y divide-forest-700/10 border-y border-forest-700/10">
+      {items.map((item, i) => {
+        const isOpen = open === i;
+        const answer = typeof item.answer === "string" ? item.answer : "";
+        return (
+          <div key={i}>
+            <h3>
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={`faq-panel-${i}`}
+                id={`faq-trigger-${i}`}
+                onClick={() => setOpen(isOpen ? null : i)}
+                className="flex w-full items-center justify-between gap-4 py-5 text-left text-lg font-medium text-forest-900"
+              >
+                {item.question}
+                <span aria-hidden className={`shrink-0 text-leaf-600 transition-transform duration-300 ${isOpen ? "rotate-45" : ""}`}>
+                  +
+                </span>
+              </button>
+            </h3>
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  id={`faq-panel-${i}`}
+                  role="region"
+                  aria-labelledby={`faq-trigger-${i}`}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                >
+                  <p className="pb-5 pr-8 text-bark-700/80">{answer}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
     </div>
   );
 }

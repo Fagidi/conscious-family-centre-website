@@ -1,120 +1,80 @@
 "use client";
 
-import { useRef } from "react";
-import Image from "@/components/ui/CineImage";
-import dynamic from "next/dynamic";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import TextReveal from "@/components/animation/TextReveal";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import type { HomeHero } from "@/lib/types";
 import Button from "@/components/ui/Button";
-import type { HeroContent } from "@/lib/types";
+import SmartImage from "@/components/ui/SmartImage";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
+};
+const rise = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } },
+};
 
-const AmbientParticles = dynamic(() => import("@/components/three/AmbientParticles"), {
-  ssr: false,
-});
-
-export default function Hero({ content }: { content: HeroContent }) {
-  const ref = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const el = ref.current;
-      if (!el) return;
-
-      // Cinematic settle on load
-      gsap.fromTo(
-        "[data-hero-image]",
-        { scale: 1.12, autoAlpha: 0 },
-        { scale: 1, autoAlpha: 1, duration: 2.2, ease: "power3.out" },
-      );
-      gsap.fromTo(
-        "[data-hero-meta]",
-        { autoAlpha: 0, y: 28 },
-        { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.15, delay: 0.9, ease: "power3.out" },
-      );
-
-      // Slow departure parallax as the user scrolls away
-      gsap.to("[data-hero-image]", {
-        yPercent: 14,
-        scale: 1.06,
-        ease: "none",
-        scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 0.6 },
-      });
-      gsap.to("[data-hero-content]", {
-        yPercent: -10,
-        autoAlpha: 0.25,
-        ease: "none",
-        scrollTrigger: { trigger: el, start: "top top", end: "75% top", scrub: 0.6 },
-      });
-    },
-    { scope: ref },
-  );
-
+/**
+ * Full-viewport editorial hero. Cinematic image with a slow scale-in, a soft
+ * scrim for legible cream text, an oversized display headline, and a clear
+ * three-tier CTA hierarchy. Content is CMS-driven (homePage.hero).
+ */
+export default function Hero({ hero }: { hero: HomeHero }) {
   return (
-    <section ref={ref} className="grain relative flex h-svh min-h-[640px] items-end overflow-hidden">
-      {/* Cinematic backdrop */}
-      <div data-hero-image className="absolute inset-0 will-change-transform">
-        {content.image && (
-          <Image
-            src={content.image}
-            alt={content.imageAlt ?? ""}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        )}
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/45 to-noir/30" />
-      <div className="absolute inset-0 bg-gradient-to-r from-noir/55 via-transparent to-transparent" />
-
-      {/* Ambient depth */}
-      <AmbientParticles className="absolute inset-0 z-[1]" />
-
-      {/* Content */}
-      <div data-hero-content className="container-site relative z-10 pb-20 md:pb-28">
-        <p data-hero-meta className="eyebrow mb-7 flex items-center gap-4">
-          <span className="inline-block h-px w-10 bg-amethyst" aria-hidden />
-          {content.eyebrow}
-        </p>
-
-        <TextReveal
-          as="h1"
-          immediate
-          delay={0.5}
-          lines={content.titleLines}
-          className="max-w-5xl font-display text-display-xl font-light"
-        />
-
-        <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
-          <p data-hero-meta className="max-w-md text-base font-light leading-relaxed text-ivory/80">
-            {content.subtitle}
-          </p>
-          <div data-hero-meta className="flex flex-wrap items-center gap-5">
-            {content.ctaLabel && content.ctaHref && (
-              <Button href={content.ctaHref}>{content.ctaLabel}</Button>
-            )}
-            {content.secondaryCtaLabel && content.secondaryCtaHref && (
-              <Button href={content.secondaryCtaHref} variant="ghost">
-                {content.secondaryCtaLabel}
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll cue */}
-      <div
-        data-hero-meta
-        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
-        aria-hidden="true"
+    <section className="relative flex min-h-svh items-end overflow-hidden">
+      <motion.div
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute inset-0"
       >
-        <span className="text-[0.6rem] uppercase tracking-[0.4em] text-ivory-dim">Scroll</span>
-        <span className="block h-12 w-px animate-pulse bg-gradient-to-b from-amethyst to-transparent" />
-      </div>
+        <SmartImage image={hero.image} fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-forest-900/92 via-forest-900/45 to-forest-900/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-forest-900/50 to-transparent" />
+      </motion.div>
+
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="relative z-10 mx-auto w-full max-w-site px-gutter pb-24 pt-44 text-cream md:pb-32"
+      >
+        {hero.eyebrow && (
+          <motion.p
+            variants={rise}
+            className="mb-6 inline-flex items-center rounded-full border border-cream/25 px-4 py-1.5 text-eyebrow font-semibold uppercase text-cream/90 backdrop-blur-sm"
+          >
+            {hero.eyebrow}
+          </motion.p>
+        )}
+        <motion.h1 variants={rise} className="max-w-5xl text-display-2xl text-cream">
+          {hero.headline}
+        </motion.h1>
+        {hero.subhead && (
+          <motion.p variants={rise} className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/85 md:text-xl">
+            {hero.subhead}
+          </motion.p>
+        )}
+        <motion.div variants={rise} className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-3">
+          <Button href={hero.primaryCta.href} size="lg">
+            {hero.primaryCta.label}
+          </Button>
+          <Button
+            href={hero.secondaryCta.href}
+            size="lg"
+            variant="ghost"
+            className="border-cream/40 text-cream hover:bg-cream/10"
+          >
+            {hero.secondaryCta.label}
+          </Button>
+          {hero.tertiaryCta && (
+            <Link href={hero.tertiaryCta.href} className="ml-1 inline-flex items-center gap-1.5 text-sm font-semibold text-sun-400 underline-offset-4 hover:underline">
+              {hero.tertiaryCta.label} <span aria-hidden>→</span>
+            </Link>
+          )}
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

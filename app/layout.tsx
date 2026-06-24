@@ -1,56 +1,47 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
-import { getSeoSettings } from "@/lib/data";
+import { Fraunces, Inter } from "next/font/google";
+import { getDefaultSeo } from "@/lib/data";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+const display = Fraunces({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
 
-const sans = Manrope({
+const sans = Inter({
   subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://saraiphotobooth.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://consciousfamilycentre.com";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoSettings();
+  const seo = await getDefaultSeo();
   return {
     metadataBase: new URL(siteUrl),
-    title: {
-      default: seo.metaTitle,
-      template: "%s | Sarai Photo Booth",
-    },
-    description: seo.metaDescription,
+    title: { default: seo.title, template: "%s | Conscious Family Centre" },
+    description: seo.description,
     keywords: seo.keywords,
     openGraph: {
-      title: seo.metaTitle,
-      description: seo.metaDescription,
+      title: seo.title,
+      description: seo.description,
       url: siteUrl,
-      siteName: "Sarai Photo Booth",
-      locale: "en_US",
+      siteName: "Conscious Family Centre",
+      locale: "en_NG",
       type: "website",
       ...(seo.ogImage ? { images: [{ url: seo.ogImage }] } : {}),
     },
-    twitter: {
-      card: "summary_large_image",
-      title: seo.metaTitle,
-      description: seo.metaDescription,
-    },
+    twitter: { card: "summary_large_image", title: seo.title, description: seo.description },
     robots: { index: true, follow: true },
   };
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body>{children}</body>

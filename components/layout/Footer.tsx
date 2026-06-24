@@ -1,111 +1,106 @@
 import Link from "next/link";
-import Reveal from "@/components/animation/Reveal";
-import TextReveal from "@/components/animation/TextReveal";
-import type { SiteSettings } from "@/lib/types";
+import type { SiteSettings, Navigation } from "@/lib/types";
+import { whatsappLink } from "@/lib/utils";
+import Button from "@/components/ui/Button";
+import NewsletterForm from "@/components/forms/NewsletterForm";
 
-const NAV = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contact", href: "/contact" },
-];
+interface FooterProps {
+  settings: SiteSettings;
+  navigation: Navigation;
+}
 
-export default function Footer({ settings }: { settings: SiteSettings }) {
-  const year = new Date().getFullYear();
+/** Premium footer — camp CTA band, nav, contact/NAP, socials, newsletter. */
+export default function Footer({ settings, navigation }: FooterProps) {
+  const socials = Object.entries(settings.socials).filter(([, url]) => Boolean(url));
 
   return (
-    <footer className="hairline bg-noir">
-      <div className="container-site pb-12 pt-24 md:pt-32">
-        {/* Invitation */}
-        <div className="mb-20 flex flex-col items-start justify-between gap-10 md:mb-28 md:flex-row md:items-end">
+    <footer className="bg-forest-900 text-cream">
+      {/* Camp CTA band */}
+      <div className="border-b border-cream/10">
+        <div className="mx-auto flex max-w-content flex-col items-center gap-5 px-gutter py-12 text-center md:flex-row md:justify-between md:text-left">
           <div>
-            <Reveal y={24}>
-              <p className="eyebrow mb-6">{settings.announcement}</p>
-            </Reveal>
-            <TextReveal
-              as="p"
-              lines={settings.footerInvitationLines}
-              className="font-display text-display-lg font-light"
-            />
+            <p className="font-display text-display-sm text-cream">Ready to join us this summer?</p>
+            <p className="mt-1 text-cream/70">Secure a place at our holiday camp — spaces are limited.</p>
           </div>
-          <Reveal delay={0.2}>
-            <Link
-              href="/contact"
-              className="group inline-flex items-center gap-4 border-b border-amethyst pb-3 text-[0.72rem] font-medium uppercase tracking-[0.3em] text-ivory transition-colors duration-500 hover:text-amethyst-bright"
-            >
-              {settings.bookingCtaLabel}
-              <span aria-hidden className="transition-transform duration-500 ease-luxe group-hover:translate-x-2">
-                →
-              </span>
-            </Link>
-          </Reveal>
+          <Button href="/camp-registration" variant="secondary">
+            Register for Camp
+          </Button>
+        </div>
+      </div>
+
+      {/* Main footer */}
+      <div className="mx-auto grid max-w-content gap-10 px-gutter py-16 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p className="font-display text-2xl">{settings.siteName}</p>
+          <p className="mt-3 max-w-xs text-sm text-cream/70">{settings.tagline}</p>
+          {socials.length > 0 && (
+            <div className="mt-5 flex gap-4 text-sm text-cream/80">
+              {socials.map(([name, url]) => (
+                <a key={name} href={url as string} target="_blank" rel="noopener noreferrer" className="capitalize hover:text-cream">
+                  {name}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Columns */}
-        <Reveal stagger={0.08} className="grid grid-cols-1 gap-12 border-t border-noir-line pt-14 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <p className="font-display text-xl tracking-[0.18em]">SARAI</p>
-            <p className="mt-4 max-w-xs text-sm font-light leading-relaxed text-ivory-dim">
-              {settings.tagline}. {settings.serviceArea}.
-            </p>
-          </div>
-          <nav aria-label="Footer">
-            <p className="eyebrow mb-5">Navigate</p>
-            <ul className="space-y-3">
-              {NAV.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="link-underline text-sm font-light text-ivory/75 transition-colors duration-400 hover:text-ivory"
-                  >
-                    {item.label}
+        {navigation.footer.map((col) => (
+          <div key={col.heading}>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-sun-400">{col.heading}</p>
+            <ul className="space-y-2 text-sm text-cream/80">
+              {col.links.map((link) => (
+                <li key={`${col.heading}-${link.label}`}>
+                  <Link href={link.href} className="hover:text-cream">
+                    {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
-          <div>
-            <p className="eyebrow mb-5">Contact</p>
-            <ul className="space-y-3 text-sm font-light text-ivory/75">
-              <li>
-                <a className="link-underline hover:text-ivory" href={`mailto:${settings.email}`}>
-                  {settings.email}
-                </a>
-              </li>
-              <li>
-                <a className="link-underline hover:text-ivory" href={`tel:${settings.phone.replace(/[^+\d]/g, "")}`}>
-                  {settings.phone}
-                </a>
-              </li>
-              <li className="text-ivory-dim">{settings.location}</li>
-            </ul>
           </div>
-          <div>
-            <p className="eyebrow mb-5">Follow</p>
-            <a
-              href={settings.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="link-underline text-sm font-light text-ivory/75 hover:text-ivory"
-            >
-              Instagram
-            </a>
-          </div>
-        </Reveal>
+        ))}
 
-        {/* Legal */}
-        <div className="mt-16 flex flex-col gap-3 border-t border-noir-line pt-8 text-[0.68rem] font-light uppercase tracking-[0.22em] text-ivory-faint sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} {settings.siteName}. All rights reserved.</p>
-          <p>{settings.location}</p>
+        <div className="text-sm text-cream/80">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-sun-400">Visit & contact</p>
+          <p>{settings.address.line}</p>
+          <p>
+            {settings.address.area}, {settings.address.city}
+          </p>
+          <p className="mt-3">
+            <a href={`tel:${settings.phone.replace(/\s/g, "")}`} className="hover:text-cream">
+              {settings.phone}
+            </a>
+          </p>
+          <p>
+            <a href={whatsappLink(settings.whatsapp)} target="_blank" rel="noopener noreferrer" className="hover:text-cream">
+              WhatsApp
+            </a>
+          </p>
+          {settings.hours.map((h) => (
+            <p key={h} className="text-cream/60">
+              {h}
+            </p>
+          ))}
+          <div className="mt-5">
+            <p className="text-sm font-semibold uppercase tracking-wide text-sun-400">Newsletter</p>
+            <NewsletterForm />
+          </div>
         </div>
       </div>
 
-      {/* Oversized wordmark */}
-      <div className="overflow-hidden" aria-hidden="true">
-        <p className="container-site select-none text-center font-display text-[clamp(5rem,18vw,18rem)] font-light leading-[0.78] tracking-[0.12em] text-noir-raise">
-          SARAI
-        </p>
+      <div className="border-t border-cream/10 px-gutter py-5">
+        <div className="mx-auto flex max-w-content flex-col items-center justify-between gap-2 text-xs text-cream/60 sm:flex-row">
+          <p>
+            © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
+          </p>
+          <div className="flex gap-4">
+            <Link href="/privacy-policy" className="hover:text-cream">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-cream">
+              Terms &amp; Conditions
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

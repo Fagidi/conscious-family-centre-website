@@ -2,22 +2,21 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-noir px-6 text-center">
-      <p className="eyebrow mb-8">Lost the thread</p>
-      <h1 className="font-display text-display-lg font-light">
-        This moment
+    <div className="flex min-h-svh flex-col items-center justify-center bg-cream px-6 text-center">
+      <p className="eyebrow mb-6">Off the trail</p>
+      <h1 className="text-display-lg">
+        This page wandered
         <br />
-        <span className="italic text-amethyst-bright">slipped away.</span>
+        <span className="italic text-leaf-600">into the woods.</span>
       </h1>
-      <p className="mt-8 max-w-sm text-sm font-light leading-relaxed text-ivory-dim">
-        The page you&rsquo;re looking for doesn&rsquo;t exist — but the evening is young.
+      <p className="mt-6 max-w-sm text-bark-700/80">
+        The page you&rsquo;re looking for doesn&rsquo;t exist — let&rsquo;s get you back.
       </p>
       <Link
         href="/"
-        className="group mt-12 inline-flex items-center gap-3 border-b border-amethyst pb-2 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-ivory transition-colors duration-500 hover:text-amethyst-bright"
+        className="mt-10 inline-flex items-center gap-2 rounded-full bg-leaf-500 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-leaf-600"
       >
         Return Home
-        <span aria-hidden className="transition-transform duration-500 group-hover:translate-x-2">→</span>
       </Link>
     </div>
   );

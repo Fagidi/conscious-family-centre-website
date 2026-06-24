@@ -2,115 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ───────────────────────────── Base ───────────────────────────── */
+/**
+ * CONSCIOUS FAMILY CENTRE — global base layer.
+ * Design tokens live in tailwind.config.ts; this file wires the canvas,
+ * typographic defaults, focus states, and a few shared utilities.
+ */
 
-:root {
-  color-scheme: dark;
-}
+@layer base {
+  :root {
+    --font-display: "Fraunces", Georgia, serif;
+    --font-sans: "Inter", system-ui, sans-serif;
+    /* Mirror of key Tailwind tokens for use in non-Tailwind contexts (Three.js, inline). */
+    --cream: #fbf7ef;
+    --forest-900: #1f3a2e;
+    --leaf-500: #5c8a4a;
+    --clay-500: #c97b4a;
+    --sun-400: #e8b23a;
+    --bark-700: #4a3b2e;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
 
-html.lenis,
-html.lenis body {
-  height: auto;
-}
+  body {
+    @apply bg-cream font-sans text-bark-700 antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
+  h1, h2, h3, h4 {
+    @apply font-display text-forest-900;
+    text-wrap: balance;
+  }
 
-body {
-  @apply bg-noir text-ivory font-sans antialiased;
-  text-rendering: optimizeLegibility;
-}
+  ::selection {
+    @apply bg-leaf-500/25 text-forest-900;
+  }
 
-::selection {
-  background: rgba(144, 97, 249, 0.35);
-  color: #f5f3ee;
-}
+  /* Visible, accessible focus ring for keyboard users. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-leaf-500 ring-offset-2 ring-offset-cream;
+    border-radius: 4px;
+  }
 
-/* Refined scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
+  /* Honor reduced-motion globally; component-level guards remain in JS. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 }
-::-webkit-scrollbar-track {
-  background: #0a0a0c;
-}
-::-webkit-scrollbar-thumb {
-  background: #26262e;
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #9061f9;
-}
-
-:focus-visible {
-  outline: 1.5px solid #9061f9;
-  outline-offset: 3px;
-}
-
-/* ─────────────────────────── Utilities ─────────────────────────── */
 
 @layer components {
-  /* Site-wide horizontal rhythm */
-  .container-site {
-    @apply mx-auto w-full max-w-site px-6 md:px-12 lg:px-20;
-  }
-
-  /* Small uppercase editorial label */
+  /* Tracked uppercase label used to open sections. */
   .eyebrow {
-    @apply font-sans text-eyebrow uppercase text-ivory-dim;
+    @apply text-eyebrow font-semibold uppercase text-leaf-600;
   }
 
-  /* Animated underline for inline links */
-  .link-underline {
-    position: relative;
-  }
-  .link-underline::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -3px;
-    height: 1px;
-    width: 100%;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .link-underline:hover::after,
-  .link-underline:focus-visible::after {
-    transform: scaleX(1);
-    transform-origin: left;
+  /* Standard centered content container with responsive gutters. */
+  .container-content {
+    @apply mx-auto w-full max-w-content px-gutter;
   }
 
-  /* Hairline divider */
-  .hairline {
-    @apply border-t border-noir-line;
-  }
-}
-
-/* Subtle film grain over imagery-heavy sections */
-.grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-}
-
-/* Respect reduced-motion preferences globally */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .container-site {
+    @apply mx-auto w-full max-w-site px-gutter;
   }
 }
