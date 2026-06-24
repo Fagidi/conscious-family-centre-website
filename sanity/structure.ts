@@ -1,9 +1,9 @@
 import type { StructureResolver } from "sanity/structure";
 
 /**
- * Studio desk — task-oriented grouping that mirrors how staff work:
- * settings, the learning offer, the two conversion inboxes (camps &
- * admissions), proof assets, editorial content, and policies.
+ * Studio desk — flat, task-oriented navigation for non-technical editors.
+ * Top-level items mirror the website's pages so staff can find content
+ * the same way visitors browse the site.
  */
 
 const singleton = (S: Parameters<StructureResolver>[0], title: string, type: string) =>
@@ -13,90 +13,112 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title("Conscious Family Centre")
     .items([
-      // ── Settings ──
-      singleton(S, "Home Page", "homePage"),
-      singleton(S, "About Page", "aboutPage"),
-      singleton(S, "Programs Page", "programsPage"),
-      singleton(S, "Gallery Page", "galleryPage"),
-      singleton(S, "FAQ Page", "faqPage"),
-      singleton(S, "Contact Page", "contactPage"),
-      singleton(S, "Site Settings", "siteSettings"),
-      singleton(S, "Navigation", "navigation"),
+      singleton(S, "Homepage", "homePage"),
+      singleton(S, "About Us", "aboutPage"),
+
+      S.listItem()
+        .title("Team Members")
+        .child(S.documentTypeList("teamMember").title("Team Members")),
+
       S.divider(),
 
-      // ── Programs ──
       S.listItem()
         .title("Programs")
         .child(
           S.list()
             .title("Programs")
             .items([
-              S.documentTypeListItem("program").title("Programs"),
-              S.documentTypeListItem("programCategory").title("Categories"),
+              singleton(S, "Page Layout & Text", "programsPage"),
+              S.documentTypeListItem("program").title("All Programs"),
+              S.documentTypeListItem("programCategory").title("Program Categories"),
             ]),
         ),
 
-      // ── Camps ──
       S.listItem()
-        .title("Camps")
+        .title("Summer Camp")
         .child(
           S.list()
-            .title("Camps")
+            .title("Summer Camp")
             .items([
               S.documentTypeListItem("campSession").title("Camp Sessions"),
-              S.documentTypeListItem("futureMakersRegistration").title("Future Makers Registrations"),
-              S.documentTypeListItem("campRegistration").title("Registrations (legacy)"),
+              S.documentTypeListItem("futureMakersRegistration").title("Camp Registrations"),
+              S.documentTypeListItem("campRegistration").title("Past Registrations"),
             ]),
         ),
 
-      // ── Admissions inbox ──
-      S.listItem()
-        .title("Admissions")
-        .child(
-          S.list()
-            .title("Admissions")
-            .items([
-              S.documentTypeListItem("inquiry").title("Inquiries"),
-              S.documentTypeListItem("admissionEnquiry").title("Admission Enquiries"),
-              S.documentTypeListItem("tourBooking").title("Tour Bookings"),
-              S.documentTypeListItem("event").title("Term Dates & Events"),
-            ]),
-        ),
       S.divider(),
 
-      // ── People & proof ──
       S.listItem()
-        .title("People & Proof")
+        .title("Gallery")
         .child(
           S.list()
-            .title("People & Proof")
+            .title("Gallery")
             .items([
-              S.documentTypeListItem("teamMember").title("Team"),
-              S.documentTypeListItem("testimonial").title("Testimonials"),
-              S.documentTypeListItem("galleryItem").title("Gallery"),
-              S.documentTypeListItem("galleryCategory").title("Gallery Categories"),
+              singleton(S, "Page Layout & Text", "galleryPage"),
+              S.documentTypeListItem("galleryItem").title("Photos"),
+              S.documentTypeListItem("galleryCategory").title("Albums"),
               S.documentTypeListItem("featuredStory").title("Featured Stories"),
+            ]),
+        ),
+
+      S.listItem()
+        .title("Testimonials")
+        .child(S.documentTypeList("testimonial").title("Testimonials")),
+
+      S.divider(),
+
+      S.listItem()
+        .title("FAQ")
+        .child(
+          S.list()
+            .title("Frequently Asked Questions")
+            .items([
+              singleton(S, "Page Layout & Text", "faqPage"),
+              S.documentTypeListItem("faq").title("Questions & Answers"),
+              S.documentTypeListItem("faqCategory").title("Question Categories"),
+            ]),
+        ),
+
+      S.listItem()
+        .title("News & Publications")
+        .child(
+          S.list()
+            .title("News & Publications")
+            .items([
+              S.documentTypeListItem("post").title("Blog Posts"),
+              S.documentTypeListItem("guide").title("Parent Guides"),
               S.documentTypeListItem("author").title("Authors"),
             ]),
         ),
 
-      // ── Content ──
+      S.divider(),
+
       S.listItem()
-        .title("Content")
+        .title("Contact Information")
         .child(
           S.list()
-            .title("Content")
+            .title("Contact Information")
             .items([
-              S.documentTypeListItem("page").title("Pages"),
-              S.documentTypeListItem("post").title("Blog"),
-              S.documentTypeListItem("guide").title("Guides"),
-              S.documentTypeListItem("faq").title("FAQ"),
-              S.documentTypeListItem("faqCategory").title("FAQ Categories"),
-              S.documentTypeListItem("contactMessage").title("Contact Messages"),
-              S.documentTypeListItem("subscriber").title("Subscribers"),
+              singleton(S, "Page Layout & Text", "contactPage"),
+              S.documentTypeListItem("contactMessage").title("Messages"),
+              S.documentTypeListItem("inquiry").title("Inquiries"),
+              S.documentTypeListItem("admissionEnquiry").title("Admission Enquiries"),
+              S.documentTypeListItem("tourBooking").title("Tour Bookings"),
             ]),
         ),
 
-      // ── Policies ──
-      S.documentTypeListItem("policy").title("Policies"),
+      S.listItem()
+        .title("Site Settings")
+        .child(
+          S.list()
+            .title("Site Settings")
+            .items([
+              singleton(S, "General Settings", "siteSettings"),
+              singleton(S, "Navigation Menus", "navigation"),
+              S.documentTypeListItem("event").title("Term Dates & Events"),
+              S.documentTypeListItem("policy").title("Policies"),
+              S.documentTypeListItem("page").title("Custom Pages"),
+              S.documentTypeListItem("subscriber").title("Newsletter Subscribers"),
+            ]),
+        ),
     ]);

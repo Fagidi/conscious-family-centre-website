@@ -1,113 +1,127 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-/**
- * Page-builder sections. The `page` document composes these in any order
- * so editors build marketing pages (Home, Why CFC…) without dev work.
- * Each maps 1:1 to a member of the PageSection union in lib/types.ts and
- * is projected by pageBySlugQuery.
- */
+const iconOptions = [
+  { title: "Leaf", value: "leaf" },
+  { title: "Sprout", value: "sprout" },
+  { title: "Sun", value: "sun" },
+  { title: "Compass", value: "compass" },
+];
 
 export const heroSection = defineType({
   name: "heroSection",
-  title: "Hero",
+  title: "Hero Banner",
   type: "object",
   fields: [
-    defineField({ name: "eyebrow", type: "string" }),
-    defineField({ name: "headline", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "subhead", type: "text", rows: 2 }),
-    defineField({ name: "image", type: "imageWithAlt" }),
-    defineField({ name: "ctas", type: "array", of: [{ type: "cta" }], validation: (r) => r.max(2) }),
+    defineField({ name: "eyebrow", title: "Section Label", type: "string", description: "Small text displayed above the heading" }),
+    defineField({ name: "headline", title: "Heading", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "subhead", title: "Subheading", type: "text", rows: 2 }),
+    defineField({ name: "image", title: "Background Image", type: "imageWithAlt" }),
+    defineField({ name: "ctas", title: "Buttons", type: "array", of: [{ type: "cta" }], validation: (r) => r.max(2) }),
   ],
-  preview: { select: { title: "headline" }, prepare: ({ title }) => ({ title: `Hero — ${title}` }) },
+  preview: { select: { title: "headline" }, prepare: ({ title }) => ({ title: `Hero Banner — ${title}` }) },
 });
 
 export const pillarsSection = defineType({
   name: "pillarsSection",
-  title: "Value pillars",
+  title: "Value Highlights",
   type: "object",
   fields: [
-    defineField({ name: "eyebrow", type: "string" }),
-    defineField({ name: "heading", type: "string" }),
+    defineField({ name: "eyebrow", title: "Section Label", type: "string", description: "Small text displayed above the heading" }),
+    defineField({ name: "heading", title: "Heading", type: "string" }),
     defineField({
       name: "pillars",
+      title: "Items",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
           fields: [
-            defineField({ name: "title", type: "string" }),
-            defineField({ name: "description", type: "text", rows: 2 }),
-            defineField({ name: "icon", type: "string", description: "Icon key (leaf, sprout, sun…)" }),
+            defineField({ name: "title", title: "Title", type: "string" }),
+            defineField({ name: "description", title: "Description", type: "text", rows: 2 }),
+            defineField({ name: "icon", title: "Icon", type: "string", options: { list: iconOptions } }),
           ],
           preview: { select: { title: "title" } },
         }),
       ],
     }),
   ],
-  preview: { prepare: () => ({ title: "Value pillars" }) },
+  preview: { prepare: () => ({ title: "Value Highlights" }) },
 });
 
 export const statsSection = defineType({
   name: "statsSection",
-  title: "Stats",
+  title: "Statistics",
   type: "object",
   fields: [
     defineField({
       name: "stats",
+      title: "Numbers",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
           fields: [
-            defineField({ name: "value", type: "number", validation: (r) => r.required() }),
-            defineField({ name: "suffix", type: "string", description: "e.g. + or %" }),
-            defineField({ name: "label", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "value", title: "Number", type: "number", validation: (r) => r.required() }),
+            defineField({ name: "suffix", title: "Symbol After Number", type: "string", description: "e.g. + or %" }),
+            defineField({ name: "label", title: "Label", type: "string", validation: (r) => r.required() }),
           ],
           preview: { select: { value: "value", label: "label" }, prepare: ({ value, label }) => ({ title: `${value} ${label}` }) },
         }),
       ],
     }),
   ],
-  preview: { prepare: () => ({ title: "Stats band" }) },
+  preview: { prepare: () => ({ title: "Statistics" }) },
 });
 
 export const splitFeature = defineType({
   name: "splitFeature",
-  title: "Split feature",
+  title: "Image & Text",
   type: "object",
   fields: [
-    defineField({ name: "eyebrow", type: "string" }),
-    defineField({ name: "heading", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "body", type: "array", of: [{ type: "block" }] }),
-    defineField({ name: "image", type: "imageWithAlt", validation: (r) => r.required() }),
-    defineField({ name: "imageSide", type: "string", options: { list: ["left", "right"], layout: "radio" }, initialValue: "right" }),
-    defineField({ name: "cta", type: "cta" }),
+    defineField({ name: "eyebrow", title: "Section Label", type: "string", description: "Small text displayed above the heading" }),
+    defineField({ name: "heading", title: "Heading", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "body", title: "Content", type: "array", of: [{ type: "block" }] }),
+    defineField({ name: "image", title: "Image", type: "imageWithAlt", validation: (r) => r.required() }),
+    defineField({
+      name: "imageSide",
+      title: "Image Position",
+      type: "string",
+      options: {
+        list: [
+          { title: "Left side", value: "left" },
+          { title: "Right side", value: "right" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "right",
+    }),
+    defineField({ name: "cta", title: "Button", type: "cta" }),
   ],
-  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: `Split — ${title}` }) },
+  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: `Image & Text — ${title}` }) },
 });
 
 export const ctaBand = defineType({
   name: "ctaBand",
-  title: "CTA band",
+  title: "Call to Action Banner",
   type: "object",
   fields: [
-    defineField({ name: "heading", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "body", type: "text", rows: 2 }),
-    defineField({ name: "cta", type: "cta", validation: (r) => r.required() }),
-    defineField({ name: "image", type: "imageWithAlt" }),
+    defineField({ name: "heading", title: "Heading", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "body", title: "Description", type: "text", rows: 2 }),
+    defineField({ name: "cta", title: "Button", type: "cta", validation: (r) => r.required() }),
+    defineField({ name: "image", title: "Background Image", type: "imageWithAlt" }),
   ],
-  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: `CTA — ${title}` }) },
+  preview: { select: { title: "heading" }, prepare: ({ title }) => ({ title: `Action Banner — ${title}` }) },
 });
 
 export const gallerySection = defineType({
   name: "gallerySection",
-  title: "Gallery",
+  title: "Photo Gallery",
   type: "object",
   fields: [
-    defineField({ name: "heading", type: "string" }),
-    defineField({ name: "items", type: "array", of: [{ type: "imageWithAlt" }] }),
+    defineField({ name: "heading", title: "Heading", type: "string" }),
+    defineField({ name: "items", title: "Photos", type: "array", of: [{ type: "imageWithAlt" }] }),
   ],
-  preview: { prepare: () => ({ title: "Gallery section" }) },
+  preview: { prepare: () => ({ title: "Photo Gallery" }) },
 });
 
 export const testimonialsSection = defineType({
@@ -115,10 +129,10 @@ export const testimonialsSection = defineType({
   title: "Testimonials",
   type: "object",
   fields: [
-    defineField({ name: "heading", type: "string" }),
-    defineField({ name: "testimonials", type: "array", of: [{ type: "reference", to: [{ type: "testimonial" }] }] }),
+    defineField({ name: "heading", title: "Heading", type: "string" }),
+    defineField({ name: "testimonials", title: "Selected Testimonials", type: "array", of: [{ type: "reference", to: [{ type: "testimonial" }] }] }),
   ],
-  preview: { prepare: () => ({ title: "Testimonials section" }) },
+  preview: { prepare: () => ({ title: "Testimonials" }) },
 });
 
 export const faqSection = defineType({
@@ -126,11 +140,22 @@ export const faqSection = defineType({
   title: "FAQ",
   type: "object",
   fields: [
-    defineField({ name: "heading", type: "string" }),
-    defineField({ name: "category", type: "string", options: { list: ["camps", "membership", "general"] } }),
-    defineField({ name: "faqs", type: "array", of: [{ type: "reference", to: [{ type: "faq" }] }] }),
+    defineField({ name: "heading", title: "Heading", type: "string" }),
+    defineField({
+      name: "category",
+      title: "Show Questions About",
+      type: "string",
+      options: {
+        list: [
+          { title: "Camps", value: "camps" },
+          { title: "Membership", value: "membership" },
+          { title: "General", value: "general" },
+        ],
+      },
+    }),
+    defineField({ name: "faqs", title: "Selected Questions", type: "array", of: [{ type: "reference", to: [{ type: "faq" }] }] }),
   ],
-  preview: { prepare: () => ({ title: "FAQ section" }) },
+  preview: { prepare: () => ({ title: "FAQ" }) },
 });
 
 export const sectionObjects = [

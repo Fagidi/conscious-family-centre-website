@@ -1,9 +1,9 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 const navItemFields = [
-  defineField({ name: "label", type: "string", validation: (r) => r.required() }),
-  defineField({ name: "href", type: "string", validation: (r) => r.required() }),
-  defineField({ name: "group", type: "string", description: "Optional group label (mega-menu)" }),
+  defineField({ name: "label", title: "Menu Label", type: "string", validation: (r) => r.required() }),
+  defineField({ name: "href", title: "Link", type: "string", validation: (r) => r.required(), description: "Page address (e.g. /programs)" }),
+  defineField({ name: "group", title: "Menu Group", type: "string", description: "Optional group name for the mega menu" }),
 ];
 
 export const siteSettings = defineType({
@@ -12,68 +12,71 @@ export const siteSettings = defineType({
   type: "document",
   groups: [
     { name: "general", title: "General", default: true },
-    { name: "contact", title: "Contact" },
-    { name: "social", title: "Social & banner" },
-    { name: "seo", title: "Default SEO" },
+    { name: "contact", title: "Contact Details" },
+    { name: "social", title: "Social Media & Banner" },
+    { name: "seo", title: "Search Engine Settings" },
   ],
   fields: [
-    defineField({ name: "siteName", type: "string", group: "general", validation: (r) => r.required() }),
-    defineField({ name: "tagline", type: "string", group: "general" }),
-    defineField({ name: "phone", type: "string", group: "contact" }),
-    defineField({ name: "whatsapp", title: "WhatsApp number", type: "string", group: "contact" }),
-    defineField({ name: "email", type: "string", group: "contact" }),
+    defineField({ name: "siteName", title: "Site Name", type: "string", group: "general", validation: (r) => r.required() }),
+    defineField({ name: "tagline", title: "Tagline", type: "string", group: "general" }),
+    defineField({ name: "phone", title: "Phone Number", type: "string", group: "contact" }),
+    defineField({ name: "whatsapp", title: "WhatsApp Number", type: "string", group: "contact" }),
+    defineField({ name: "email", title: "Email Address", type: "string", group: "contact" }),
     defineField({
       name: "address",
+      title: "Address",
       type: "object",
       group: "contact",
       fields: [
-        defineField({ name: "line", type: "string" }),
-        defineField({ name: "area", type: "string" }),
-        defineField({ name: "city", type: "string" }),
-        defineField({ name: "mapUrl", title: "Map URL", type: "url" }),
-        defineField({ name: "lat", type: "number" }),
-        defineField({ name: "lng", type: "number" }),
+        defineField({ name: "line", title: "Street Address", type: "string" }),
+        defineField({ name: "area", title: "Area", type: "string" }),
+        defineField({ name: "city", title: "City", type: "string" }),
+        defineField({ name: "mapUrl", title: "Google Maps Link", type: "url" }),
+        defineField({ name: "lat", title: "Latitude", type: "number" }),
+        defineField({ name: "lng", title: "Longitude", type: "number" }),
       ],
     }),
-    defineField({ name: "hours", title: "Opening hours", type: "array", of: [{ type: "string" }], group: "contact" }),
+    defineField({ name: "hours", title: "Opening Hours", type: "array", of: [{ type: "string" }], group: "contact" }),
     defineField({
       name: "socials",
+      title: "Social Media Links",
       type: "object",
       group: "social",
       fields: [
-        defineField({ name: "instagram", type: "url" }),
-        defineField({ name: "facebook", type: "url" }),
-        defineField({ name: "tiktok", type: "url" }),
-        defineField({ name: "youtube", type: "url" }),
+        defineField({ name: "instagram", title: "Instagram", type: "url" }),
+        defineField({ name: "facebook", title: "Facebook", type: "url" }),
+        defineField({ name: "tiktok", title: "TikTok", type: "url" }),
+        defineField({ name: "youtube", title: "YouTube", type: "url" }),
       ],
     }),
     defineField({
       name: "announcement",
-      title: "Announcement banner",
-      description: "Top-of-site banner — Summer Camp, Open Enrolments, Community Events.",
+      title: "Announcement Banner",
+      description: "Top-of-site banner for important announcements (Summer Camp, Open Enrolments, Community Events)",
       type: "object",
       group: "social",
       fields: [
-        defineField({ name: "active", title: "Show banner", type: "boolean", initialValue: false }),
-        defineField({ name: "text", type: "string", validation: (r) => r.max(120) }),
-        defineField({ name: "ctaLabel", title: "CTA label", type: "string" }),
-        defineField({ name: "link", type: "string", description: "Where the banner/CTA links to." }),
+        defineField({ name: "active", title: "Show Banner", type: "boolean", initialValue: false }),
+        defineField({ name: "text", title: "Banner Text", type: "string", validation: (r) => r.max(120) }),
+        defineField({ name: "ctaLabel", title: "Button Text", type: "string" }),
+        defineField({ name: "link", title: "Button Link", type: "string", description: "Where the banner button goes (e.g. /summer-camp)" }),
       ],
     }),
-    defineField({ name: "defaultSeo", title: "Default SEO", type: "seo", group: "seo" }),
+    defineField({ name: "defaultSeo", title: "Default Search Engine Settings", type: "seo", group: "seo" }),
   ],
   preview: { prepare: () => ({ title: "Site Settings" }) },
 });
 
 export const navigation = defineType({
   name: "navigation",
-  title: "Navigation",
+  title: "Navigation Menus",
   type: "document",
   fields: [
     defineField({
       name: "header",
-      title: "Header menu",
+      title: "Header Menu",
       type: "array",
+      description: "The main navigation at the top of every page",
       of: [
         defineArrayMember({
           type: "object",
@@ -82,7 +85,9 @@ export const navigation = defineType({
             ...navItemFields,
             defineField({
               name: "children",
+              title: "Dropdown Items",
               type: "array",
+              description: "Sub-menu items shown in a dropdown",
               of: [defineArrayMember({ type: "object", fields: navItemFields, preview: { select: { title: "label", subtitle: "href" } } })],
             }),
           ],
@@ -92,15 +97,17 @@ export const navigation = defineType({
     }),
     defineField({
       name: "footer",
-      title: "Footer columns",
+      title: "Footer Columns",
       type: "array",
+      description: "Link groups shown at the bottom of every page",
       of: [
         defineArrayMember({
           type: "object",
           fields: [
-            defineField({ name: "heading", type: "string" }),
+            defineField({ name: "heading", title: "Column Title", type: "string" }),
             defineField({
               name: "links",
+              title: "Links",
               type: "array",
               of: [defineArrayMember({ type: "object", fields: navItemFields, preview: { select: { title: "label" } } })],
             }),
@@ -110,7 +117,7 @@ export const navigation = defineType({
       ],
     }),
   ],
-  preview: { prepare: () => ({ title: "Navigation" }) },
+  preview: { prepare: () => ({ title: "Navigation Menus" }) },
 });
 
 export { homePage } from "./homePage";

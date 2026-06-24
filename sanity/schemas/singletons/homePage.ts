@@ -1,35 +1,36 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-/**
- * Homepage — a singleton composing the hero + each marketing section's copy.
- * Showcased collections (programs, camps, testimonials, gallery, faqs) are
- * separate documents; this holds only the framing copy + the hero media.
- */
+const iconOptions = [
+  { title: "Leaf", value: "leaf" },
+  { title: "Sprout", value: "sprout" },
+  { title: "Sun", value: "sun" },
+  { title: "Compass", value: "compass" },
+];
 
 const section = (name: string, title: string, fields: ReturnType<typeof defineField>[]) =>
   defineField({ name, title, type: "object", options: { collapsible: true, collapsed: true }, fields });
 
-const eyebrow = defineField({ name: "eyebrow", type: "string" });
-const heading = defineField({ name: "heading", type: "string", validation: (r) => r.required() });
-const intro = defineField({ name: "intro", type: "text", rows: 2 });
+const eyebrow = defineField({ name: "eyebrow", title: "Section Label", type: "string", description: "Small text displayed above the heading" });
+const heading = defineField({ name: "heading", title: "Heading", type: "string", validation: (r) => r.required() });
+const intro = defineField({ name: "intro", title: "Introduction Text", type: "text", rows: 2 });
 
 export const homePage = defineType({
   name: "homePage",
-  title: "Home Page",
+  title: "Homepage",
   type: "document",
   groups: [
     { name: "content", title: "Content", default: true },
-    { name: "seo", title: "SEO" },
+    { name: "seo", title: "Search Engine Settings" },
   ],
   fields: [
-    section("hero", "Hero", [
+    section("hero", "Hero Banner", [
       eyebrow,
-      defineField({ name: "headline", type: "text", rows: 2, validation: (r) => r.required() }),
-      defineField({ name: "subhead", type: "text", rows: 2 }),
-      defineField({ name: "image", type: "imageWithAlt" }),
-      defineField({ name: "primaryCta", type: "cta" }),
-      defineField({ name: "secondaryCta", type: "cta" }),
-      defineField({ name: "tertiaryCta", type: "cta" }),
+      defineField({ name: "headline", title: "Main Headline", type: "text", rows: 2, validation: (r) => r.required() }),
+      defineField({ name: "subhead", title: "Subheading", type: "text", rows: 2 }),
+      defineField({ name: "image", title: "Background Image", type: "imageWithAlt" }),
+      defineField({ name: "primaryCta", title: "Primary Button", type: "cta" }),
+      defineField({ name: "secondaryCta", title: "Secondary Button", type: "cta" }),
+      defineField({ name: "tertiaryCta", title: "Third Button", type: "cta" }),
     ]),
     section("why", "Why Families Choose Us", [
       eyebrow,
@@ -37,14 +38,15 @@ export const homePage = defineType({
       intro,
       defineField({
         name: "pillars",
+        title: "Key Reasons",
         type: "array",
         of: [
           defineArrayMember({
             type: "object",
             fields: [
-              defineField({ name: "title", type: "string", validation: (r) => r.required() }),
-              defineField({ name: "description", type: "text", rows: 2 }),
-              defineField({ name: "icon", type: "string", description: "Icon key (leaf, sprout, sun, compass…)" }),
+              defineField({ name: "title", title: "Title", type: "string", validation: (r) => r.required() }),
+              defineField({ name: "description", title: "Description", type: "text", rows: 2 }),
+              defineField({ name: "icon", title: "Icon", type: "string", options: { list: iconOptions } }),
             ],
             preview: { select: { title: "title" } },
           }),
@@ -55,22 +57,22 @@ export const homePage = defineType({
     section("about", "About Preview", [
       eyebrow,
       heading,
-      defineField({ name: "paragraphs", type: "array", of: [{ type: "text" }] }),
-      defineField({ name: "image", type: "imageWithAlt" }),
-      defineField({ name: "cta", type: "cta" }),
+      defineField({ name: "paragraphs", title: "Text Paragraphs", type: "array", of: [{ type: "text" }] }),
+      defineField({ name: "image", title: "Image", type: "imageWithAlt" }),
+      defineField({ name: "cta", title: "Button", type: "cta" }),
     ]),
-    section("programs", "Programs Preview", [eyebrow, heading, intro, defineField({ name: "cta", type: "cta" })]),
+    section("programs", "Programs Preview", [eyebrow, heading, intro, defineField({ name: "cta", title: "Button", type: "cta" })]),
     section("camp", "Summer Camp Feature", [eyebrow, heading, intro]),
-    section("gallery", "Gallery Preview", [eyebrow, heading, intro, defineField({ name: "cta", type: "cta" })]),
+    section("gallery", "Gallery Preview", [eyebrow, heading, intro, defineField({ name: "cta", title: "Button", type: "cta" })]),
     section("testimonials", "Testimonials", [eyebrow, heading]),
-    section("faq", "FAQ Preview", [eyebrow, heading, defineField({ name: "cta", type: "cta" })]),
-    section("finalCta", "Final Conversion", [
+    section("faq", "FAQ Preview", [eyebrow, heading, defineField({ name: "cta", title: "Button", type: "cta" })]),
+    section("finalCta", "Final Call to Action", [
       eyebrow,
       heading,
-      defineField({ name: "body", type: "text", rows: 2 }),
-      defineField({ name: "ctas", type: "array", of: [{ type: "cta" }], validation: (r) => r.max(3) }),
+      defineField({ name: "body", title: "Description", type: "text", rows: 2 }),
+      defineField({ name: "ctas", title: "Buttons", type: "array", of: [{ type: "cta" }], validation: (r) => r.max(3) }),
     ]),
     defineField({ name: "seo", type: "seo", group: "seo" }),
   ],
-  preview: { prepare: () => ({ title: "Home Page" }) },
+  preview: { prepare: () => ({ title: "Homepage" }) },
 });
