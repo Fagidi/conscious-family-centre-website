@@ -14,7 +14,7 @@ export default function StickyMobileActionBar({ whatsapp }: Props) {
       >
         WhatsApp
       </a>
-      <a href="/camps" className="bg-leaf-500 py-4 text-center text-sm font-medium text-cream">
+      <a href="/camp-registration" className="bg-leaf-500 py-4 text-center text-sm font-medium text-cream hover:bg-leaf-600 transition-colors">
         Register
       </a>
     </div>

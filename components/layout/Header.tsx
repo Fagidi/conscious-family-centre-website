@@ -55,20 +55,20 @@ export default function Header({ settings }: HeaderProps) {
         style={{ top: announcementHeight ? `${announcementHeight + 16}px` : "64px" }}
       >
         <div className="mx-auto max-w-site px-gutter">
-          <div className="pointer-events-auto rounded-2xl flex items-center justify-between gap-4 px-7 py-5 bg-cream shadow-lg">
+          <div className="pointer-events-auto rounded-2xl md:rounded-2xl flex items-center justify-between gap-3 md:gap-4 px-4 md:px-7 py-4 md:py-5 bg-cream shadow-lg">
             {/* Logo */}
-            <Link href="/" className="font-display text-lg font-semibold tracking-tight text-forest-900 flex-shrink-0 hover:text-leaf-600 transition-colors">
+            <Link href="/" className="font-display text-base md:text-lg font-semibold tracking-tight text-forest-900 flex-shrink-0 hover:text-leaf-600 transition-colors">
               {settings.siteName}
             </Link>
 
             {/* Right side: search, CTA, menu */}
-            <div className="flex items-center gap-3 sm:gap-4 ml-auto">
+            <div className="flex items-center gap-2 md:gap-4 ml-auto">
               {/* Search icon */}
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-forest-900 hover:text-leaf-600 hover:bg-forest-900/5 transition-all"
+                className="flex h-10 w-10 md:h-9 md:w-9 items-center justify-center rounded-full text-forest-900 hover:text-leaf-600 hover:bg-forest-900/5 transition-all active:bg-forest-900/10"
               >
                 <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="7" />
@@ -89,7 +89,7 @@ export default function Header({ settings }: HeaderProps) {
                 onClick={() => setMenuOpen(true)}
                 aria-label="Open menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-2 text-sm font-semibold text-forest-900 hover:text-leaf-600 transition-colors"
+                className="flex items-center gap-2 h-10 px-3 md:h-auto md:px-0 rounded-lg md:rounded-none text-sm md:text-sm font-semibold text-forest-900 hover:text-leaf-600 active:bg-forest-900/10 md:active:bg-transparent transition-colors md:transition-colors"
               >
                 <span className="hidden sm:inline">Menu</span>
                 <span aria-hidden className="flex flex-col gap-[5px]">
