@@ -1,27 +1,43 @@
 import type { Metadata } from "next";
+import { getFounder } from "@/lib/data";
+import { PortableText } from "@portabletext/react";
 import PageHero from "@/components/shared/PageHero";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import FounderModal from "@/components/about/FounderModal";
+import SmartImage from "@/components/ui/SmartImage";
 
-// Default founder data (will be replaced with CMS data)
-const DEFAULT_FOUNDER = {
-  name: "Founder Name",
-  role: "Founder & Executive Director",
-  shortBio: "Passionate about nature-connected learning and family wellness.",
-  fullBio: "Coming soon — the complete story of the founder's journey, vision, and mission to create Conscious Family Centre. This section will be populated from Sanity CMS.",
-  philosophy: "Our approach is rooted in the belief that children learn best when connected to nature, supported by intentional community, and guided by caring adults who understand child development.",
-  vision: "We envision a world where every child has access to nature-connected learning experiences that foster emotional resilience, creativity, and a deep love for the natural world.",
-  photo: null,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const founder = await getFounder();
+  return {
+    title: founder
+      ? `${founder.name} — Founder | Conscious Family Centre`
+      : "Founder | Conscious Family Centre",
+    description: founder?.shortBio ?? "Learn about the founder and vision behind Conscious Family Centre",
+  };
+}
 
-export const metadata: Metadata = {
-  title: "Founder | Conscious Family Centre",
-  description: "Learn about the founder and vision behind Conscious Family Centre",
-};
+export default async function FounderPage() {
+  const founder = await getFounder();
 
-export default function FounderPage() {
-  const founder = DEFAULT_FOUNDER;
+  if (!founder) {
+    return (
+      <>
+        <PageHero
+          title="The Founder"
+          intro="The vision, philosophy, and journey behind Conscious Family Centre"
+        />
+        <Section tone="white" spacing="lg">
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="text-lg text-bark-700/70 mb-8">
+              Founder information is coming soon. In the meantime, feel free to
+              get in touch to learn more about us.
+            </p>
+            <Button href="/contact">Get in Touch</Button>
+          </div>
+        </Section>
+      </>
+    );
+  }
 
   return (
     <>
@@ -30,66 +46,124 @@ export default function FounderPage() {
         intro="The vision, philosophy, and journey behind Conscious Family Centre"
       />
 
-      {/* Founder Profile Card */}
+      {/* Founder hero profile */}
       <Section tone="white" spacing="lg">
-        <div className="max-w-2xl mx-auto mb-20">
-          <div className="rounded-2xl border border-forest-700/10 bg-cream p-8 md:p-12">
-            {/* Founder Info */}
-            <div className="text-center mb-8">
-              {founder.photo && (
-                <div className="mb-6 flex justify-center">
-                  <div className="relative w-32 h-32 rounded-full overflow-hidden bg-forest-700/10">
-                    <img
-                      src={founder.photo}
-                      alt={founder.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              )}
+        <div className="grid gap-12 md:grid-cols-[1fr_1.2fr] items-start max-w-5xl mx-auto">
+          {founder.photo?.src && (
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-forest-700/10">
+              <SmartImage
+                image={founder.photo}
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-cover"
+              />
+            </div>
+          )}
 
-              <h2 className="font-display text-4xl font-semibold text-forest-900 mb-2">
-                {founder.name}
-              </h2>
+          <div>
+            <h2 className="font-display text-4xl md:text-5xl font-semibold text-forest-900 mb-2">
+              {founder.name}
+            </h2>
 
-              <p className="text-lg text-leaf-600 font-semibold mb-6">
-                {founder.role}
-              </p>
+            <p className="text-xl text-leaf-600 font-semibold mb-6">
+              {founder.role}
+            </p>
 
-              <p className="text-lg leading-relaxed text-bark-700/85 mb-8">
+            {founder.shortBio && (
+              <p className="text-lg leading-relaxed text-bark-700/85 mb-6">
                 {founder.shortBio}
               </p>
+            )}
 
-              <FounderModal founderName={founder.name} founderBio={founder.fullBio} />
-            </div>
+            {founder.fullBio && Array.isArray(founder.fullBio) && founder.fullBio.length > 0 && (
+              <div className="prose prose-lg prose-forest max-w-none text-bark-700/85 mb-8">
+                <PortableText value={founder.fullBio} />
+              </div>
+            )}
+
+            {founder.qualifications && founder.qualifications.length > 0 && (
+              <div className="mb-8">
+                <h3 className="font-display text-xl font-semibold text-forest-900 mb-4">
+                  Qualifications &amp; Background
+                </h3>
+                <ul className="space-y-2">
+                  {founder.qualifications.map((qual, i) => (
+                    <li key={i} className="flex gap-3 text-bark-700/80">
+                      <span className="text-leaf-600 font-semibold">&#10003;</span>
+                      {qual}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {(founder.email || founder.socialLinks) && (
+              <div className="flex flex-wrap gap-4 mb-6">
+                {founder.email && (
+                  <a
+                    href={`mailto:${founder.email}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Email
+                  </a>
+                )}
+                {founder.socialLinks?.linkedin && (
+                  <a
+                    href={founder.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    LinkedIn
+                  </a>
+                )}
+                {founder.socialLinks?.instagram && (
+                  <a
+                    href={founder.socialLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    Instagram
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </Section>
 
-      {/* Philosophy & Vision */}
-      <Section tone="sage" spacing="lg">
-        <div className="grid gap-12 md:grid-cols-2 max-w-4xl mx-auto">
-          {/* Philosophy */}
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-forest-900 mb-6">
-              Founding Philosophy
-            </h3>
-            <p className="text-lg leading-relaxed text-bark-700/85">
-              {founder.philosophy}
-            </p>
-          </div>
+      {/* Philosophy & Vision storytelling sections */}
+      {(founder.founderPhilosophy || founder.founderVision) && (
+        <Section tone="sage" spacing="lg">
+          <div className="grid gap-12 md:grid-cols-2 max-w-4xl mx-auto">
+            {founder.founderPhilosophy && (
+              <div>
+                <h3 className="font-display text-2xl font-semibold text-forest-900 mb-6">
+                  Founding Philosophy
+                </h3>
+                <p className="text-lg leading-relaxed text-bark-700/85">
+                  {founder.founderPhilosophy}
+                </p>
+              </div>
+            )}
 
-          {/* Vision */}
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-forest-900 mb-6">
-              Vision for the Future
-            </h3>
-            <p className="text-lg leading-relaxed text-bark-700/85">
-              {founder.vision}
-            </p>
+            {founder.founderVision && (
+              <div>
+                <h3 className="font-display text-2xl font-semibold text-forest-900 mb-6">
+                  Vision for the Future
+                </h3>
+                <p className="text-lg leading-relaxed text-bark-700/85">
+                  {founder.founderVision}
+                </p>
+              </div>
+            )}
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
 
       {/* CTA */}
       <Section tone="white" spacing="lg">

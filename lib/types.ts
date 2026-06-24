@@ -20,8 +20,9 @@ export interface ImageAsset {
   caption?: string;
 }
 
-/** Portable Text. Typed loosely to avoid a hard dep until render time. */
-export type PortableText = unknown[];
+/** Portable Text. Typed as `any[]` for render-time compat with @portabletext/react. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PortableText = any[];
 
 export interface Cta {
   label: string;
@@ -203,14 +204,30 @@ export interface CampSession {
   seo: Seo;
 }
 
+export interface SocialLinks {
+  instagram?: string;
+  linkedin?: string;
+  twitter?: string;
+}
+
+export type Department = "leadership" | "education" | "operations" | "creative" | "support";
+
 export interface TeamMember {
   slug: string;
   name: string;
   role: string;
+  department?: Department;
   photo: ImageAsset;
-  bio: string;
+  shortBio?: string;
+  fullBio?: PortableText;
   qualifications: string[];
-  order: number;
+  email?: string;
+  socialLinks?: SocialLinks;
+  featured?: boolean;
+  founder?: boolean;
+  founderPhilosophy?: string;
+  founderVision?: string;
+  displayOrder: number;
 }
 
 export interface Testimonial {

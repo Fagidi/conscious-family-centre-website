@@ -183,15 +183,29 @@ export const campAvailabilityQuery = groq`
 
 /* ── People & proof ────────────────────────────────────────────── */
 
+const teamProjection = `
+  "slug": slug.current, name, role, department,
+  "photo": photo${image}, shortBio, fullBio,
+  qualifications, email, socialLinks,
+  featured, founder, founderPhilosophy, founderVision,
+  displayOrder
+`;
+
 export const teamQuery = groq`
-  *[_type == "teamMember"] | order(order asc){
-    "slug": slug.current, name, role, "photo": photo${image}, bio, qualifications, order
+  *[_type == "teamMember"] | order(displayOrder asc){
+    ${teamProjection}
   }
 `;
 
 export const teamMemberBySlugQuery = groq`
   *[_type == "teamMember" && slug.current == $slug][0]{
-    "slug": slug.current, name, role, "photo": photo${image}, bio, qualifications, order
+    ${teamProjection}
+  }
+`;
+
+export const founderQuery = groq`
+  *[_type == "teamMember" && founder == true][0]{
+    ${teamProjection}
   }
 `;
 

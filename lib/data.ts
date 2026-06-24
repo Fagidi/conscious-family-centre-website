@@ -116,6 +116,8 @@ export const getCampSlugs = (): Promise<string[]> => fetchList(q.campSlugsQuery,
 export const getTeam = (): Promise<TeamMember[]> => fetchList(q.teamQuery, []);
 export const getTeamMember = (slug: string): Promise<TeamMember | null> =>
   fetchOne(q.teamMemberBySlugQuery, { slug });
+export const getFounder = (): Promise<TeamMember | null> =>
+  fetchOne(q.founderQuery, {});
 export const getTeamSlugs = (): Promise<string[]> => fetchList(q.teamSlugsQuery, []);
 export const getTestimonials = (): Promise<Testimonial[]> =>
   fetchList(q.testimonialsQuery, testimonialsFallback);

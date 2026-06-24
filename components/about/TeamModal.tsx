@@ -1,13 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-
-interface TeamMember {
-  name: string;
-  role: string;
-  bio: string;
-  qualifications?: string[];
-}
+import { PortableText } from "@portabletext/react";
+import type { TeamMember } from "@/lib/types";
 
 interface TeamModalProps {
   isOpen: boolean;
@@ -33,7 +28,6 @@ export default function TeamModal({ isOpen, onClose, member }: TeamModalProps) {
             onClick={(e) => e.stopPropagation()}
             className="bg-cream rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8 md:p-12"
           >
-            {/* Header */}
             <div className="mb-8">
               <h2 className="font-display text-4xl font-semibold text-forest-900 mb-2">
                 {member.name}
@@ -41,18 +35,25 @@ export default function TeamModal({ isOpen, onClose, member }: TeamModalProps) {
               <p className="text-lg font-semibold text-leaf-600">
                 {member.role}
               </p>
+              {member.department && (
+                <p className="text-sm text-bark-700/60 mt-1 capitalize">
+                  {member.department}
+                </p>
+              )}
             </div>
 
-            {/* Bio */}
-            {member.bio && (
+            {member.fullBio && Array.isArray(member.fullBio) && member.fullBio.length > 0 ? (
+              <div className="mb-8 prose prose-lg prose-forest max-w-none text-bark-700/85">
+                <PortableText value={member.fullBio} />
+              </div>
+            ) : member.shortBio ? (
               <div className="mb-8">
                 <p className="text-lg leading-relaxed text-bark-700/85">
-                  {member.bio}
+                  {member.shortBio}
                 </p>
               </div>
-            )}
+            ) : null}
 
-            {/* Qualifications */}
             {member.qualifications && member.qualifications.length > 0 && (
               <div className="mb-8">
                 <h3 className="font-display text-xl font-semibold text-forest-900 mb-4">
@@ -61,7 +62,7 @@ export default function TeamModal({ isOpen, onClose, member }: TeamModalProps) {
                 <ul className="space-y-3">
                   {member.qualifications.map((qual, i) => (
                     <li key={i} className="flex gap-3 text-bark-700/80">
-                      <span className="text-leaf-600 font-semibold flex-shrink-0">✓</span>
+                      <span className="text-leaf-600 font-semibold flex-shrink-0">&#10003;</span>
                       <span>{qual}</span>
                     </li>
                   ))}
@@ -69,7 +70,52 @@ export default function TeamModal({ isOpen, onClose, member }: TeamModalProps) {
               </div>
             )}
 
-            {/* Close Button */}
+            {(member.email || member.socialLinks) && (
+              <div className="mb-8 flex flex-wrap gap-4">
+                {member.email && (
+                  <a
+                    href={`mailto:${member.email}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Email
+                  </a>
+                )}
+                {member.socialLinks?.linkedin && (
+                  <a
+                    href={member.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    LinkedIn
+                  </a>
+                )}
+                {member.socialLinks?.instagram && (
+                  <a
+                    href={member.socialLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    Instagram
+                  </a>
+                )}
+                {member.socialLinks?.twitter && (
+                  <a
+                    href={member.socialLinks.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-leaf-600 hover:text-leaf-700 transition-colors"
+                  >
+                    Twitter
+                  </a>
+                )}
+              </div>
+            )}
+
             <button
               onClick={onClose}
               className="px-8 py-3 rounded-full bg-leaf-600 text-cream font-semibold hover:bg-leaf-700 transition-colors"

@@ -2,64 +2,20 @@ import type { Metadata } from "next";
 import { getTeam } from "@/lib/data";
 import PageHero from "@/components/shared/PageHero";
 import Section from "@/components/ui/Section";
+import Button from "@/components/ui/Button";
 import TeamMemberCard from "@/components/about/TeamMemberCard";
 
 export const metadata: Metadata = {
   title: "Meet The Team | Conscious Family Centre",
-  description: "The caring, intentional people who make Conscious Family Centre home",
+  description:
+    "The caring, intentional people who make Conscious Family Centre home",
 };
-
-// Default team members (for CMS population later)
-const DEFAULT_TEAM = [
-  {
-    name: "Team Member 1",
-    role: "Position Title",
-    bio: "Brief bio to be added in Sanity CMS",
-    slug: "team-member-1",
-    qualifications: ["Qualification 1", "Qualification 2"],
-  },
-  {
-    name: "Team Member 2",
-    role: "Position Title",
-    bio: "Brief bio to be added in Sanity CMS",
-    slug: "team-member-2",
-    qualifications: ["Qualification 1", "Qualification 2"],
-  },
-  {
-    name: "Team Member 3",
-    role: "Position Title",
-    bio: "Brief bio to be added in Sanity CMS",
-    slug: "team-member-3",
-    qualifications: ["Qualification 1", "Qualification 2"],
-  },
-  {
-    name: "Team Member 4",
-    role: "Position Title",
-    bio: "Brief bio to be added in Sanity CMS",
-    slug: "team-member-4",
-    qualifications: ["Qualification 1", "Qualification 2"],
-  },
-  {
-    name: "Team Member 5",
-    role: "Position Title",
-    bio: "Brief bio to be added in Sanity CMS",
-    slug: "team-member-5",
-    qualifications: ["Qualification 1", "Qualification 2"],
-  },
-  {
-    name: "Team Member 6",
-    role: "Position Title",
-    bio: "Brief bio to be added in Sanity CMS",
-    slug: "team-member-6",
-    qualifications: ["Qualification 1", "Qualification 2"],
-  },
-];
 
 export default async function TeamPage() {
   const team = await getTeam();
 
-  // Use CMS data if available, otherwise use defaults for design preview
-  const displayTeam = team.length > 0 ? team : DEFAULT_TEAM;
+  const founder = team.find((m) => m.founder);
+  const staff = team.filter((m) => !m.founder);
 
   return (
     <>
@@ -68,18 +24,35 @@ export default async function TeamPage() {
         intro="The caring, intentional people who make CFC home"
       />
 
-      <Section tone="white" spacing="lg">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {displayTeam.map((member) => (
-            <TeamMemberCard key={member.slug} member={member} />
-          ))}
-        </div>
-
-        {displayTeam.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg text-bark-700/70">
-              No team members added yet.
+      {founder && (
+        <Section tone="sage" spacing="lg">
+          <div className="text-center mb-8">
+            <p className="text-sm font-semibold uppercase tracking-widest text-leaf-600 mb-2">
+              Our Founder
             </p>
+          </div>
+          <div className="max-w-sm mx-auto">
+            <TeamMemberCard member={founder} />
+          </div>
+        </Section>
+      )}
+
+      <Section tone="white" spacing="lg">
+        {staff.length > 0 ? (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {staff.map((member) => (
+              <TeamMemberCard key={member.slug} member={member} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-card-lg border border-forest-700/10 bg-cream p-10 text-center shadow-soft">
+            <p className="mx-auto max-w-prose text-lg text-bark-700/80">
+              We can&apos;t wait to introduce you to the people who care for
+              your children every day. The best way to meet them is in person.
+            </p>
+            <div className="mt-6">
+              <Button href="/contact">Book a Visit</Button>
+            </div>
           </div>
         )}
       </Section>
