@@ -13,19 +13,9 @@ import CommunityStatement from "@/components/about/CommunityStatement";
 import Community from "@/components/about/Community";
 import VisitUs from "@/components/about/VisitUs";
 import StatsSection from "@/components/shared/StatsSection";
-import SectionNav from "@/components/layout/SectionNav";
 import FinalCta from "@/components/home/FinalCta";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://consciousfamilycentre.com";
-
-const ABOUT_SECTIONS = [
-  { id: "our-story", label: "Story" },
-  { id: "mission", label: "Mission" },
-  { id: "vision", label: "Vision" },
-  { id: "environment", label: "Environment" },
-  { id: "community", label: "Community" },
-  { id: "visit", label: "Visit Us" },
-];
 
 const IMPACT_STATS = [
   { value: 200, suffix: "+", label: "Families Served" },
@@ -85,7 +75,6 @@ export default async function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
       />
-      <SectionNav items={ABOUT_SECTIONS} />
       <AboutHero hero={about.hero} />
 
       <div id="our-story" className="scroll-mt-24">
