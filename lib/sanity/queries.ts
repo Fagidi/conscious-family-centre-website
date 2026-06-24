@@ -20,7 +20,7 @@ export const siteSettingsQuery = groq`
     siteName, tagline, phone, whatsapp, email,
     address{ line, area, city, mapUrl, lat, lng },
     hours, socials,
-    announcement{ active, text, href },
+    announcement{ active, text, ctaLabel, link },
     defaultSeo{ title, description, "ogImage": ogImage.asset->url, keywords }
   }
 `;
