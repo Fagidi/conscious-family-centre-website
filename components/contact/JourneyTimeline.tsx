@@ -5,17 +5,17 @@ import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 
 /** Getting-started timeline — numbered steps from first hello to belonging. */
 export default function JourneyTimeline({ journey }: { journey: ContactPageContent["journey"] }) {
-  if (journey.steps.length === 0) return null;
+  if (!journey.steps?.length) return null;
 
   return (
     <Section tone="cream" spacing="lg">
       <SectionHeading eyebrow={journey.eyebrow} title={journey.heading} intro={journey.intro} className="max-w-2xl" />
 
       <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {journey.steps.map((step, i) => (
+        {(journey.steps ?? []).map((step, i) => (
           <StaggerItem key={step.title} className="relative">
             {/* Connector line (desktop) */}
-            {i < journey.steps.length - 1 && (
+            {i < (journey.steps ?? []).length - 1 && (
               <span aria-hidden className="absolute left-12 top-6 hidden h-px w-full bg-forest-700/15 lg:block" />
             )}
             <div className="relative">

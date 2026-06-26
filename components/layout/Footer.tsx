@@ -11,7 +11,7 @@ interface FooterProps {
 
 /** Premium footer — camp CTA band, nav, contact/NAP, socials, newsletter. */
 export default function Footer({ settings, navigation }: FooterProps) {
-  const socials = Object.entries(settings.socials).filter(([, url]) => Boolean(url));
+  const socials = Object.entries(settings.socials ?? {}).filter(([, url]) => Boolean(url));
 
   return (
     <footer className="bg-forest-900 text-cream">
@@ -44,11 +44,11 @@ export default function Footer({ settings, navigation }: FooterProps) {
           )}
         </div>
 
-        {navigation.footer.map((col) => (
+        {(navigation.footer ?? []).map((col) => (
           <div key={col.heading}>
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-sun-400">{col.heading}</p>
             <ul className="space-y-2 text-sm text-cream/80">
-              {col.links.map((link) => (
+              {(col.links ?? []).map((link) => (
                 <li key={`${col.heading}-${link.label}`}>
                   <Link href={link.href} className="hover:text-cream">
                     {link.label}
@@ -75,7 +75,7 @@ export default function Footer({ settings, navigation }: FooterProps) {
               WhatsApp
             </a>
           </p>
-          {settings.hours.map((h) => (
+          {(settings.hours ?? []).map((h) => (
             <p key={h} className="text-cream/60">
               {h}
             </p>

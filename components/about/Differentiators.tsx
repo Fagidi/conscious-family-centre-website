@@ -23,7 +23,7 @@ export default function Differentiators({ differentiators }: { differentiators: 
       </Reveal>
 
       <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {differentiators.items.map((item) => (
+        {(differentiators.items ?? []).map((item) => (
           <StaggerItem
             key={item.title}
             className="group rounded-card-lg border border-cream/15 bg-cream/[0.04] p-7 transition-colors duration-500 ease-organic hover:bg-cream/[0.08]"

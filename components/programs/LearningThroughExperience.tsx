@@ -23,7 +23,7 @@ export default function LearningThroughExperience({
       />
 
       <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {experience.items.map((item) => (
+        {(experience.items ?? []).map((item) => (
           <StaggerItem
             key={item.title}
             className="group rounded-card-lg border border-forest-700/10 bg-white p-7 shadow-soft transition-shadow duration-500 ease-organic hover:shadow-lift"

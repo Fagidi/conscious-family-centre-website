@@ -20,9 +20,11 @@ export default function FaqPreview({ content, faqs }: FaqPreviewProps) {
         <div>
           <SectionHeading eyebrow={content.eyebrow} title={content.heading} />
           <div className="mt-10 hidden lg:block">
-            <Button href={content.cta.href} variant="primary">
-              {content.cta.label}
-            </Button>
+            {content.cta && (
+              <Button href={content.cta.href} variant="primary">
+                {content.cta.label}
+              </Button>
+            )}
           </div>
         </div>
 

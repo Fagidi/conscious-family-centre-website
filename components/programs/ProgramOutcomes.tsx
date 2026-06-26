@@ -18,7 +18,7 @@ export default function ProgramOutcomes({ outcomes }: { outcomes: ProgramsPageCo
       </Reveal>
 
       <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-        {outcomes.cards.map((card) => (
+        {(outcomes.cards ?? []).map((card) => (
           <StaggerItem
             key={card.title}
             className="group rounded-card-lg border border-cream/15 bg-cream/[0.04] p-6 text-center transition-colors duration-500 ease-organic hover:bg-cream/[0.08]"

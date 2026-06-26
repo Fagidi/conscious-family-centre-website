@@ -15,7 +15,7 @@ export default function Community({ community }: { community: AboutContent["comm
           <p className="eyebrow mb-3">{community.eyebrow}</p>
           <h2 className="text-display-md">{community.heading}</h2>
           <div className="mt-5 space-y-4 text-lg leading-relaxed text-bark-700/85">
-            {community.paragraphs.map((p, i) => (
+            {(community.paragraphs ?? []).map((p, i) => (
               <p key={i}>{p}</p>
             ))}
           </div>

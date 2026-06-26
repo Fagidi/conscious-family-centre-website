@@ -27,7 +27,7 @@ export default function VisitSection({ visit }: { visit: ContactPageContent["vis
         </Reveal>
 
         <Stagger className="space-y-3 lg:pt-4">
-          {visit.benefits.map((benefit) => (
+          {(visit.benefits ?? []).map((benefit) => (
             <StaggerItem
               key={benefit}
               className="flex items-start gap-3 rounded-card-lg border border-forest-700/10 bg-white p-5 shadow-soft"

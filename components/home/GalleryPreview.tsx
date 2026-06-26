@@ -21,9 +21,11 @@ export default function GalleryPreview({ content, items }: GalleryPreviewProps) 
       <div className="flex flex-col gap-12 sm:flex-row sm:items-end sm:justify-between">
         <SectionHeading eyebrow={content.eyebrow} title={content.heading} intro={content.intro} className="max-w-2xl" />
         <div className="hidden sm:block flex-shrink-0">
-          <Button href={content.cta.href} variant="primary">
-            {content.cta.label}
-          </Button>
+          {content.cta && (
+            <Button href={content.cta.href} variant="primary">
+              {content.cta.label}
+            </Button>
+          )}
         </div>
       </div>
 

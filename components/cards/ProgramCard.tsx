@@ -21,7 +21,7 @@ export default function ProgramCard({ program }: { program: ProgramPreview }) {
       </div>
       <div className="p-6">
         <div className="mb-3 flex flex-wrap gap-1.5">
-          {program.ageBands.map((band) => (
+          {(program.ageBands ?? []).map((band) => (
             <Tag key={band} tone="sage">
               {AGE_BANDS[band]?.label ?? band}
             </Tag>

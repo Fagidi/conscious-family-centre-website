@@ -11,7 +11,7 @@ export default function WhyChooseUs({ content }: { content: HomeContent["why"] }
       <SectionHeading eyebrow={content.eyebrow} title={content.heading} intro={content.intro} className="max-w-2xl" />
 
       <Stagger className="mt-20 grid gap-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
-        {content.pillars.map((pillar, i) => (
+        {(content.pillars ?? []).map((pillar, i) => (
           <StaggerItem key={pillar.title} className="flex flex-col">
             {/* Large, prominent icon */}
             <span className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-leaf-600/10 text-leaf-600">

@@ -11,7 +11,7 @@ import { Stagger, StaggerItem } from "@/components/motion/Stagger";
  * are CMS-managed (aboutPage.environment.images).
  */
 export default function LearningEnvironment({ environment }: { environment: AboutContent["environment"] }) {
-  const tiles = environment.images.slice(0, 5);
+  const tiles = (environment.images ?? []).slice(0, 5);
   if (tiles.length === 0) return null;
 
   return (

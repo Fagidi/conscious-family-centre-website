@@ -19,7 +19,7 @@ export default function Philosophy({ philosophy }: { philosophy: AboutContent["p
       />
 
       <Stagger className="mt-12 grid gap-6 sm:grid-cols-2">
-        {philosophy.cards.map((card, i) => (
+        {(philosophy.cards ?? []).map((card, i) => (
           <StaggerItem
             key={card.title}
             className="group relative flex flex-col rounded-card-lg border border-forest-700/10 bg-white p-8 shadow-soft transition-shadow duration-500 ease-organic hover:shadow-lift"

@@ -13,7 +13,7 @@ export default function FinalCta({ content }: { content: HomeContent["finalCta"]
           <h2 className="mx-auto max-w-3xl text-display-lg text-cream">{content.heading}</h2>
           {content.body && <p className="mx-auto mt-5 max-w-xl text-lg text-cream/85">{content.body}</p>}
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            {content.ctas.map((cta, i) => (
+            {(content.ctas ?? []).map((cta, i) => (
               <Button
                 key={cta.label}
                 href={cta.href}

@@ -16,7 +16,7 @@ export default function VisitUs({ settings, image }: { settings: SiteSettings; i
           <dl className="mt-8 space-y-6">
             <div>
               <dt className="text-xs font-semibold uppercase tracking-wide text-cream/55">Opening hours</dt>
-              {settings.hours.map((h) => (
+              {(settings.hours ?? []).map((h) => (
                 <dd key={h} className="mt-1 text-lg text-cream">{h}</dd>
               ))}
             </div>

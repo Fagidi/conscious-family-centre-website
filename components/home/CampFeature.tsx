@@ -34,7 +34,7 @@ export default function CampFeature({ content, camp }: CampFeatureProps) {
                 <Icon name="sun" className="h-5 w-5 text-sun-400 flex-shrink-0" />
                 <span>{formatDateRange(camp.startDate, camp.endDate)} · {camp.ageBand}</span>
               </li>
-              {camp.included.slice(0, 4).map((item) => (
+              {(camp.included ?? []).slice(0, 4).map((item) => (
                 <li key={item} className="flex items-center gap-3">
                   <Icon name="leaf" className="h-5 w-5 text-leaf-500 flex-shrink-0" />
                   <span>{item}</span>

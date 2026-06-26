@@ -17,14 +17,16 @@ export default function AboutPreview({ content }: { content: HomeContent["about"
           <p className="eyebrow mb-4">{content.eyebrow}</p>
           <h2 className="text-display-lg mb-6">{content.heading}</h2>
           <div className="space-y-5 text-lg leading-relaxed text-bark-700/85">
-            {content.paragraphs.map((p, i) => (
+            {(content.paragraphs ?? []).map((p, i) => (
               <p key={i}>{p}</p>
             ))}
           </div>
           <div className="mt-10">
-            <Button href={content.cta.href} variant="primary">
-              {content.cta.label}
-            </Button>
+            {content.cta && (
+              <Button href={content.cta.href} variant="primary">
+                {content.cta.label}
+              </Button>
+            )}
           </div>
         </Reveal>
       </div>

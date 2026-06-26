@@ -12,7 +12,7 @@ export default function ProgramOverview({ overview }: { overview: ProgramsPageCo
           <p className="eyebrow mb-3">{overview.eyebrow}</p>
           <h2 className="text-display-md">{overview.heading}</h2>
           <div className="mt-5 space-y-4 text-lg leading-relaxed text-bark-700/85">
-            {overview.paragraphs.map((p, i) => (
+            {(overview.paragraphs ?? []).map((p, i) => (
               <p key={i}>{p}</p>
             ))}
           </div>

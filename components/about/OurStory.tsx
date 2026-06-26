@@ -28,7 +28,7 @@ export default function OurStory({ story }: { story: AboutContent["story"] }) {
           </Reveal>
 
           <div className="mt-6 space-y-5 text-lg leading-relaxed text-bark-700/85">
-            {story.paragraphs.map((p, i) => (
+            {(story.paragraphs ?? []).map((p, i) => (
               <Reveal key={i} delay={i * 0.05}>
                 <p>{p}</p>
               </Reveal>

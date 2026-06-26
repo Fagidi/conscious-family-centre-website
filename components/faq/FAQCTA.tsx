@@ -28,7 +28,7 @@ export default function FAQCTA({ eyebrow, heading, body, ctas, variant = "final"
             <h2 className="mx-auto max-w-3xl text-display-md text-cream">{heading}</h2>
             {body && <p className="mx-auto mt-5 max-w-xl text-lg text-cream/85">{body}</p>}
             <div className="mt-9 flex flex-wrap justify-center gap-3">
-              {ctas.map((cta, i) => (
+              {(ctas ?? []).map((cta, i) => (
                 <Button
                   key={cta.label}
                   href={cta.href}
