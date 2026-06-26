@@ -4,6 +4,7 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./sanity/schemas";
 import { structure } from "./sanity/structure";
+import { campDashboardPlugin } from "./sanity/plugins/campDashboard";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "placeholder";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
@@ -17,6 +18,7 @@ const SINGLETON_TYPES = new Set([
   "contactPage",
   "siteSettings",
   "navigation",
+  "campSettings",
 ]);
 
 const SUBMISSION_TYPES = new Set([
@@ -35,7 +37,10 @@ export default defineConfig({
   basePath: "/studio",
   projectId,
   dataset,
-  plugins: [structureTool({ structure })],
+  plugins: [
+    structureTool({ structure }),
+    campDashboardPlugin(),
+  ],
   schema: { types: schemaTypes },
   document: {
     newDocumentOptions: (prev) =>

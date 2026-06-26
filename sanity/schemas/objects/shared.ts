@@ -115,4 +115,24 @@ export const scheduleItem = defineType({
   preview: { select: { time: "time", activity: "activity" }, prepare: ({ time, activity }) => ({ title: `${time} · ${activity}` }) },
 });
 
-export const sharedObjects = [imageWithAlt, seo, cta, priceTier, scheduleItem];
+export const timelineEvent = defineType({
+  name: "timelineEvent",
+  title: "Timeline Event",
+  type: "object",
+  readOnly: true,
+  fields: [
+    defineField({ name: "title", title: "Event", type: "string" }),
+    defineField({ name: "timestamp", title: "When", type: "datetime" }),
+    defineField({ name: "actor", title: "By", type: "string" }),
+    defineField({ name: "note", title: "Note", type: "text" }),
+  ],
+  preview: {
+    select: { title: "title", timestamp: "timestamp", actor: "actor" },
+    prepare: ({ title, timestamp, actor }: { title?: string; timestamp?: string; actor?: string }) => ({
+      title: title ?? "—",
+      subtitle: [actor, timestamp ? new Date(timestamp).toLocaleString("en-GB") : ""].filter(Boolean).join(" · "),
+    }),
+  },
+});
+
+export const sharedObjects = [imageWithAlt, seo, cta, priceTier, scheduleItem, timelineEvent];

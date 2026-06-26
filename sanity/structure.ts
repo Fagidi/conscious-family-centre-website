@@ -38,11 +38,58 @@ export const structure: StructureResolver = (S) =>
         .title("Summer Camp")
         .child(
           S.list()
-            .title("Summer Camp")
+            .title("Summer Camp — Future Makers 2026")
             .items([
+              S.listItem()
+                .title("All Registrations")
+                .id("fm-all")
+                .child(
+                  S.documentTypeList("futureMakersRegistration")
+                    .title("All Registrations")
+                    .defaultOrdering([{ field: "submissionDate", direction: "desc" }]),
+                ),
+
+              S.listItem()
+                .title("Payment Verification")
+                .id("fm-payment")
+                .child(
+                  S.documentTypeList("futureMakersRegistration")
+                    .title("Awaiting Payment Review")
+                    .filter('_type == "futureMakersRegistration" && paymentStatus == "awaiting-review"')
+                    .defaultOrdering([{ field: "submissionDate", direction: "desc" }]),
+                ),
+
+              S.listItem()
+                .title("Confirmed")
+                .id("fm-confirmed")
+                .child(
+                  S.documentTypeList("futureMakersRegistration")
+                    .title("Confirmed Registrations")
+                    .filter('_type == "futureMakersRegistration" && status == "confirmed"')
+                    .defaultOrdering([{ field: "submissionDate", direction: "desc" }]),
+                ),
+
+              S.listItem()
+                .title("Checked In")
+                .id("fm-checked-in")
+                .child(
+                  S.documentTypeList("futureMakersRegistration")
+                    .title("Checked In")
+                    .filter('_type == "futureMakersRegistration" && status == "checked-in"')
+                    .defaultOrdering([{ field: "submissionDate", direction: "desc" }]),
+                ),
+
+              S.divider(),
+
               S.documentTypeListItem("campSession").title("Camp Sessions"),
-              S.documentTypeListItem("futureMakersRegistration").title("Camp Registrations"),
-              S.documentTypeListItem("campRegistration").title("Past Registrations"),
+              singleton(S, "Camp Settings", "campSettings"),
+
+              S.divider(),
+
+              S.listItem()
+                .title("Archive (Old System)")
+                .id("fm-archive")
+                .child(S.documentTypeList("campRegistration").title("Past Registrations (Archive)")),
             ]),
         ),
 
