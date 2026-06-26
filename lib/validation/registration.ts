@@ -27,7 +27,9 @@ export const registrationSchema = z
     childOneGender: z.enum(["male", "female"], { errorMap: () => ({ message: "Please select a gender." }) }),
     // nullish: an unselected radio yields null (not undefined) via RHF/draft restore.
     childTwoGender: z.enum(["male", "female"]).nullish(),
-    tshirtSize: z.string().trim().min(1, "Please select a T-shirt size."),
+    tshirtSizes: z
+      .array(z.string().min(1, "Please select a size."))
+      .min(1, "Please select a T-shirt size for each child."),
 
     // Step 3 — nanny (conditional)
     nannyName: z.string().trim().optional().or(z.literal("")),
@@ -65,7 +67,7 @@ export type RegistrationValues = z.infer<typeof registrationSchema>;
 /** Fields validated at each step (drives per-step "Next" validation). */
 export const STEP_FIELDS: (keyof RegistrationValues)[][] = [
   ["email", "parentFullName", "parentPhone", "cfcAttendanceHistory"], // 1 parent
-  ["childrenFullNames", "childrenAges", "childOneGender", "tshirtSize"], // 2 child
+  ["childrenFullNames", "childrenAges", "childOneGender", "tshirtSizes"], // 2 child
   ["nannyName", "nannyPhone"], // 3 nanny (conditional)
   ["selectedMonths", "selectedWeeks", "selectedWeeksOther", "paymentOption"], // 4 programme
   ["emergencyContact"], // 5 emergency

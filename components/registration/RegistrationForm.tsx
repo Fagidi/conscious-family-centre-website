@@ -39,7 +39,7 @@ const policyItems = POLICIES.map((p) => ({ question: p.title, answer: p.body, ca
 
 const fieldsByStep: Record<string, (keyof RegistrationValues)[]> = {
   parent: ["email", "parentFullName", "parentPhone", "cfcAttendanceHistory"],
-  child: ["childrenFullNames", "childrenAges", "childOneGender", "tshirtSize"],
+  child: ["childrenFullNames", "childrenAges", "childOneGender", "tshirtSizes"],
   nanny: ["nannyName", "nannyPhone"],
   programme: ["selectedMonths", "selectedWeeks", "selectedWeeksOther", "paymentOption"],
   emergency: ["emergencyContact"],
@@ -59,12 +59,13 @@ export default function RegistrationForm() {
   } = useForm<RegistrationValues>({
     resolver: zodResolver(registrationSchema),
     mode: "onTouched",
-    defaultValues: { paymentOption: "full" },
+    defaultValues: { paymentOption: "full", tshirtSizes: [] },
   });
 
   const [step, setStep] = useState(0);
   const [childCount, setChildCount] = useState(1);
   const [childNames, setChildNames] = useState(["", "", "", "", ""]);
+  const [childTshirtSizes, setChildTshirtSizes] = useState(["", "", "", "", ""]);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -84,6 +85,9 @@ export default function RegistrationForm() {
           const filled = Math.min(Math.max(parts.length, 1), 5);
           setChildCount(filled);
           setChildNames((prev) => prev.map((_, i) => parts[i] ?? ""));
+        }
+        if (Array.isArray(parsed.tshirtSizes)) {
+          setChildTshirtSizes((prev) => prev.map((_, i) => (parsed.tshirtSizes as string[])[i] ?? ""));
         }
       } catch {
         /* ignore corrupt draft */
@@ -292,13 +296,15 @@ export default function RegistrationForm() {
                 onChange={(e) => {
                   const n = Number(e.target.value);
                   setChildCount(n);
-                  // Clear names beyond the new count
+                  // Clear names and sizes beyond the new count
                   setChildNames((prev) => prev.map((v, i) => (i < n ? v : "")));
+                  setChildTshirtSizes((prev) => prev.map((v, i) => (i < n ? v : "")));
                   // Clear child 2 gender if dropping to 1
                   if (n < 2) setValue("childTwoGender", null);
-                  // Sync combined names
+                  // Sync combined names and sizes
                   const combined = childNames.slice(0, n).filter(Boolean).join(", ");
                   setValue("childrenFullNames", combined, { shouldValidate: !!childNames[0] });
+                  setValue("tshirtSizes", childTshirtSizes.slice(0, n).filter(Boolean), { shouldValidate: false });
                 }}
               >
                 {[1, 2, 3, 4, 5].map((n) => (
@@ -367,6 +373,27 @@ export default function RegistrationForm() {
                       {genderError && <span className={errClass}>{genderError.message}</span>}
                     </fieldset>
                   )}
+
+                  {/* T-shirt size — per child */}
+                  <div>
+                    <label htmlFor={`tshirtSize-${i}`} className={labelClass}>Camp T-shirt size{req}</label>
+                    <select
+                      id={`tshirtSize-${i}`}
+                      className={cn(
+                        fieldBase,
+                        (errors.tshirtSizes as { message?: string } | undefined) && !childTshirtSizes[i] && "border-clay-600",
+                      )}
+                      value={childTshirtSizes[i]}
+                      onChange={(e) => {
+                        const updated = childTshirtSizes.map((v, idx) => (idx === i ? e.target.value : v));
+                        setChildTshirtSizes(updated);
+                        setValue("tshirtSizes", updated.slice(0, childCount).filter(Boolean), { shouldValidate: true });
+                      }}
+                    >
+                      <option value="" disabled>Select a size…</option>
+                      {TSHIRT_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
                 </div>
               );
             })}
@@ -392,22 +419,6 @@ export default function RegistrationForm() {
                 {errors.childrenAges && <span className={errClass}>{errors.childrenAges.message}</span>}
               </div>
 
-              <div>
-                <label htmlFor="tshirtSize" className={labelClass}>Camp T-shirt size{req}</label>
-                <select
-                  id="tshirtSize"
-                  className={cn(fieldBase, errors.tshirtSize && "border-clay-600")}
-                  defaultValue=""
-                  {...register("tshirtSize")}
-                >
-                  <option value="" disabled>Select a size…</option>
-                  {TSHIRT_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                {childCount > 1 && (
-                  <span className={helpClass}>Contact us to confirm T-shirt sizes for additional children.</span>
-                )}
-                {errors.tshirtSize && <span className={errClass}>{errors.tshirtSize.message}</span>}
-              </div>
             </div>
           </fieldset>
         )}
@@ -563,7 +574,7 @@ export default function RegistrationForm() {
                 ["Phone", values.parentPhone, "parent"],
                 ["Child(ren)", values.childrenFullNames, "child"],
                 ["Age", AGE_OPTIONS.find((a) => a.value === values.childrenAges)?.label, "child"],
-                ["T-shirt size", values.tshirtSize, "child"],
+                ["T-shirt size(s)", (values.tshirtSizes as string[] | undefined)?.join(", "), "child"],
                 ...(needsNanny ? [["Nanny", `${values.nannyName ?? ""} ${values.nannyPhone ?? ""}`, "nanny"] as const] : []),
                 ["Months", MONTH_OPTIONS.find((m) => m.value === values.selectedMonths)?.label, "programme"],
                 ["Weeks", values.selectedWeeks === "other" ? values.selectedWeeksOther : WEEK_OPTIONS.find((w) => w.value === values.selectedWeeks)?.label, "programme"],

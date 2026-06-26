@@ -685,7 +685,7 @@ export interface RegistrationInput {
   childrenAges: CampAgeOption;
   childOneGender: CampGender;
   childTwoGender?: CampGender;
-  tshirtSize: string;
+  tshirtSizes: string[];
   nannyName?: string;
   nannyPhone?: string;
   selectedMonths: CampMonths;
