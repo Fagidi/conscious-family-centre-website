@@ -63,9 +63,8 @@ export default function RegistrationForm() {
   });
 
   const [step, setStep] = useState(0);
-  const [childCount, setChildCount] = useState<1 | 2>(1);
-  const [childOneName, setChildOneName] = useState("");
-  const [childTwoName, setChildTwoName] = useState("");
+  const [childCount, setChildCount] = useState(1);
+  const [childNames, setChildNames] = useState(["", "", "", "", ""]);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -82,8 +81,9 @@ export default function RegistrationForm() {
         reset(parsed);
         if (parsed.childrenFullNames) {
           const parts = (parsed.childrenFullNames as string).split(",").map((s: string) => s.trim());
-          setChildOneName(parts[0] ?? "");
-          if (parts[1]) { setChildTwoName(parts[1]); setChildCount(2); }
+          const filled = Math.min(Math.max(parts.length, 1), 5);
+          setChildCount(filled);
+          setChildNames((prev) => prev.map((_, i) => parts[i] ?? ""));
         }
       } catch {
         /* ignore corrupt draft */
@@ -284,45 +284,34 @@ export default function RegistrationForm() {
 
             {/* ── How many children ── */}
             <div>
-              <p className={labelClass}>How many children are you registering?{req}</p>
-              <div className="mt-2 grid grid-cols-2 gap-3">
-                {([1, 2] as const).map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => {
-                      setChildCount(n);
-                      if (n === 1) {
-                        setChildTwoName("");
-                        setValue("childrenFullNames", childOneName, { shouldValidate: !!childOneName });
-                        setValue("childTwoGender", null);
-                      } else {
-                        const combined = [childOneName, childTwoName].filter(Boolean).join(", ");
-                        setValue("childrenFullNames", combined, { shouldValidate: !!childOneName });
-                      }
-                    }}
-                    className={cn(
-                      "flex flex-col items-center rounded-card-lg border py-6 transition-all duration-200",
-                      childCount === n
-                        ? "border-leaf-600 bg-leaf-600/5 ring-1 ring-leaf-600"
-                        : "border-forest-700/15 bg-white hover:border-forest-700/30",
-                    )}
-                  >
-                    <span className={cn("text-4xl font-bold leading-none", childCount === n ? "text-leaf-600" : "text-forest-900")}>{n}</span>
-                    <span className={cn("mt-2 text-sm font-medium", childCount === n ? "text-leaf-600" : "text-bark-700/60")}>
-                      {n === 1 ? "child" : "children"}
-                    </span>
-                  </button>
+              <label htmlFor="childCount" className={labelClass}>How many children are you registering?{req}</label>
+              <select
+                id="childCount"
+                className={fieldBase}
+                value={childCount}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setChildCount(n);
+                  // Clear names beyond the new count
+                  setChildNames((prev) => prev.map((v, i) => (i < n ? v : "")));
+                  // Clear child 2 gender if dropping to 1
+                  if (n < 2) setValue("childTwoGender", null);
+                  // Sync combined names
+                  const combined = childNames.slice(0, n).filter(Boolean).join(", ");
+                  setValue("childrenFullNames", combined, { shouldValidate: !!childNames[0] });
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>{n} {n === 1 ? "child" : "children"}</option>
                 ))}
-              </div>
+              </select>
             </div>
 
             {/* ── Per-child cards ── */}
-            {([0, 1] as const).filter((i) => i < childCount).map((i) => {
+            {Array.from({ length: childCount }, (_, i) => {
               const isFirst = i === 0;
-              const name = isFirst ? childOneName : childTwoName;
-              const setName = isFirst ? setChildOneName : setChildTwoName;
-              const genderField = (isFirst ? "childOneGender" : "childTwoGender") as keyof RegistrationValues;
+              const hasGenderField = i <= 1;
+              const genderField = (i === 0 ? "childOneGender" : "childTwoGender") as keyof RegistrationValues;
               const nameError = isFirst ? errors.childrenFullNames : undefined;
               const genderError = isFirst ? errors.childOneGender : undefined;
 
@@ -341,42 +330,43 @@ export default function RegistrationForm() {
                   {/* Name */}
                   <div>
                     <label htmlFor={`childName-${i}`} className={labelClass}>
-                      Full name{isFirst ? req : <span className="text-bark-700/50"> *</span>}
+                      Full name{req}
                     </label>
                     <input
                       id={`childName-${i}`}
                       className={cn(fieldBase, nameError && "border-clay-600")}
                       placeholder="Enter child's full name"
-                      value={name}
+                      value={childNames[i]}
                       onChange={(e) => {
-                        setName(e.target.value);
-                        const combined = isFirst
-                          ? [e.target.value, childTwoName].filter(Boolean).join(", ")
-                          : [childOneName, e.target.value].filter(Boolean).join(", ");
+                        const updated = childNames.map((v, idx) => (idx === i ? e.target.value : v));
+                        setChildNames(updated);
+                        const combined = updated.slice(0, childCount).filter(Boolean).join(", ");
                         setValue("childrenFullNames", combined, { shouldValidate: true });
                       }}
                     />
                     {nameError && <span className={errClass}>{nameError.message}</span>}
                   </div>
 
-                  {/* Gender */}
-                  <fieldset>
-                    <legend className={labelClass}>
-                      Gender{isFirst ? req : <span className="text-bark-700/50 ml-1">(optional)</span>}
-                    </legend>
-                    <div className="flex gap-2">
-                      {["male", "female"].map((g) => (
-                        <label
-                          key={g}
-                          className="flex-1 cursor-pointer rounded-card border border-forest-700/15 bg-white px-4 py-2.5 text-center text-sm capitalize has-[:checked]:border-leaf-600 has-[:checked]:bg-leaf-600 has-[:checked]:text-cream"
-                        >
-                          <input type="radio" value={g} className="sr-only" {...register(genderField)} />
-                          {g}
-                        </label>
-                      ))}
-                    </div>
-                    {genderError && <span className={errClass}>{genderError.message}</span>}
-                  </fieldset>
+                  {/* Gender — only child 1 (required) and child 2 (optional) are in the schema */}
+                  {hasGenderField && (
+                    <fieldset>
+                      <legend className={labelClass}>
+                        Gender{isFirst ? req : <span className="text-bark-700/50 ml-1">(optional)</span>}
+                      </legend>
+                      <div className="flex gap-2">
+                        {["male", "female"].map((g) => (
+                          <label
+                            key={g}
+                            className="flex-1 cursor-pointer rounded-card border border-forest-700/15 bg-white px-4 py-2.5 text-center text-sm capitalize has-[:checked]:border-leaf-600 has-[:checked]:bg-leaf-600 has-[:checked]:text-cream"
+                          >
+                            <input type="radio" value={g} className="sr-only" {...register(genderField)} />
+                            {g}
+                          </label>
+                        ))}
+                      </div>
+                      {genderError && <span className={errClass}>{genderError.message}</span>}
+                    </fieldset>
+                  )}
                 </div>
               );
             })}
@@ -414,7 +404,7 @@ export default function RegistrationForm() {
                   {TSHIRT_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
                 {childCount > 1 && (
-                  <span className={helpClass}>Registering two children? Contact us to confirm the second T-shirt size.</span>
+                  <span className={helpClass}>Contact us to confirm T-shirt sizes for additional children.</span>
                 )}
                 {errors.tshirtSize && <span className={errClass}>{errors.tshirtSize.message}</span>}
               </div>
