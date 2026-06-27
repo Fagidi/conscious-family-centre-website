@@ -1,5 +1,5 @@
 import "server-only";
-import { fetchWithFallback, fetchList, fetchOne } from "./sanity/client";
+import { fetchWithFallback, fetchList, fetchOne, mergeWithFallback } from "./sanity/client";
 import * as q from "./sanity/queries";
 import {
   siteSettings as siteSettingsFallback,
@@ -97,10 +97,14 @@ export const getPrograms = (): Promise<Program[]> => fetchList(q.programsQuery, 
 export const getFeaturedPrograms = (limit = 4): Promise<ProgramPreview[]> =>
   fetchList(q.featuredProgramsQuery, featuredProgramsFallback.slice(0, limit), { limit });
 
-/** Single program — CMS first, then the curated fallback by slug. */
+/** Single program — CMS merged over curated fallback by slug. */
 export async function getProgram(slug: string): Promise<Program | null> {
+  const fallback = programsFallback.find((p) => p.slug === slug);
   const cms = await fetchOne<Program>(q.programBySlugQuery, { slug });
-  return cms ?? programsFallback.find((p) => p.slug === slug) ?? null;
+  if (!cms && !fallback) return null;
+  if (!cms) return fallback ?? null;
+  if (!fallback) return cms;
+  return mergeWithFallback(fallback, cms);
 }
 
 export const getProgramSlugs = (): Promise<string[]> =>
