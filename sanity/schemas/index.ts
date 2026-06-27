@@ -8,8 +8,11 @@ import { learningDocuments } from "./documents/learning";
 import { formDocuments } from "./documents/forms";
 import { proofDocuments } from "./documents/proof";
 import { editorialDocuments } from "./documents/editorial";
+import { notificationDocuments } from "./documents/notifications";
 
 import { singletons } from "./singletons/settings";
+import { notificationSettings } from "./singletons/notificationSettings";
+import { emailBranding } from "./singletons/emailBranding";
 
 /**
  * Schema registry. Objects first (referenced by documents), then documents,
@@ -23,5 +26,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   ...formDocuments,
   ...proofDocuments,
   ...editorialDocuments,
+  ...notificationDocuments,
   ...singletons,
+  notificationSettings,
+  emailBranding,
 ];

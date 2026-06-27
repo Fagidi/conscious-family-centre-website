@@ -33,8 +33,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Secretary cannot access settings
-  if (pathname.startsWith("/admin/settings") && payload.role !== "admin") {
+  // Secretary cannot access admin-only areas
+  const ADMIN_ONLY = ["/admin/settings", "/admin/notifications", "/admin/system-health"];
+  if (ADMIN_ONLY.some((p) => pathname.startsWith(p)) && payload.role !== "admin") {
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 

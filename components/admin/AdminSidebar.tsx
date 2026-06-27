@@ -8,6 +8,9 @@ const NAV = [
   { href: "/admin/registrations",  label: "Registrations",  icon: "▤", adminOnly: false },
   { href: "/admin/payments",       label: "Payments",       icon: "₢", adminOnly: false },
   { href: "/admin/reports",        label: "Reports",        icon: "▦", adminOnly: false },
+  { href: "/admin/notifications",  label: "Notifications",  icon: "◎", adminOnly: true  },
+  { href: "/admin/activity",       label: "Activity",       icon: "◉", adminOnly: false },
+  { href: "/admin/system-health",  label: "System Health",  icon: "◌", adminOnly: true  },
   { href: "/admin/settings",       label: "Settings",       icon: "◈", adminOnly: true  },
 ];
 

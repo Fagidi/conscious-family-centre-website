@@ -3,7 +3,7 @@
 import { writeClient } from "../sanity/client";
 import { registrationSchema } from "../validation/registration";
 import { estimateFee } from "../futureMakers";
-import { notifyTeam, notifyCustomer } from "../notify";
+import { NotificationService } from "../notifications/service";
 import { appendRegistrationRow } from "../sheets";
 import { formatNaira } from "../utils";
 import type { ActionResult, CampAgeOption, CampWeeks } from "../types";
@@ -147,7 +147,6 @@ export async function submitRegistration(formData: FormData): Promise<ActionResu
   const feeLabel  = fee !== null ? formatNaira(fee) : "Fee to be confirmed by Conscious Family Centre";
   const months    = MONTH_LABEL[data.selectedMonths] ?? data.selectedMonths;
   const weeks     = WEEK_LABEL[data.selectedWeeks as CampWeeks];
-  const programmeLine = `${weeks} · ${months}`;
 
   // 3. Generate Registration ID
   const registrationId = await buildRegistrationId(data.childrenFullNames);
@@ -202,84 +201,21 @@ export async function submitRegistration(formData: FormData): Promise<ActionResu
   }
 
   // 6. Confirmation email to parent
-  const parentEmailBody = [
-    `Dear ${data.parentFullName},`,
-    "",
-    "Thank you for registering for the Future Makers Summer Experience 2026!",
-    "",
-    "─────────────────────────────────",
-    "REGISTRATION DETAILS",
-    "─────────────────────────────────",
-    `Registration ID : ${registrationId}`,
-    `Child(ren)       : ${data.childrenFullNames}`,
-    `Age Group        : ${AGE_LABEL[data.childrenAges as CampAgeOption]}`,
-    `Programme        : ${programmeLine}`,
-    `Payment Option   : ${PAYMENT_OPTION_LABEL[data.paymentOption] ?? data.paymentOption}`,
-    `Estimated Fee    : ${feeLabel}`,
-    "",
-    "─────────────────────────────────",
-    "WHAT HAPPENS NEXT",
-    "─────────────────────────────────",
-    "1. Our team will review your registration and proof of payment.",
-    "2. We will send a confirmation email once your place is secured.",
-    "3. Your place is only confirmed after payment has been verified.",
-    "",
-    "If you have any questions, please contact us at:",
-    "Conscious Family Centre · Wuse 2, Abuja",
-    "",
-    "Warmly,",
-    "The Conscious Family Centre Team",
-  ].join("\n");
-
-  await notifyCustomer(
-    data.email,
-    `Your Future Makers 2026 registration — ${registrationId}`,
-    parentEmailBody,
-  );
+  const regData = {
+    registrationId,
+    email:             data.email,
+    parentFullName:    data.parentFullName,
+    childrenFullNames: data.childrenFullNames,
+    childrenAges:      AGE_LABEL[data.childrenAges as CampAgeOption],
+    selectedWeeks:     weeks,
+    selectedMonths:    months,
+    paymentOption:     PAYMENT_OPTION_LABEL[data.paymentOption] ?? data.paymentOption,
+    estimatedFee:      fee ?? undefined,
+  };
+  await NotificationService.sendRegistrationConfirmation(regData);
 
   // 7. Admin notification email
-  const STUDIO_URL = process.env.NEXT_PUBLIC_SITE_URL
-    ? `${process.env.NEXT_PUBLIC_SITE_URL}/studio`
-    : "your Sanity Studio";
-
-  const adminEmailBody = [
-    `NEW REGISTRATION — Future Makers Summer Experience 2026`,
-    "═══════════════════════════════════════════════════════",
-    "",
-    `Registration ID  : ${registrationId}`,
-    `Submitted        : ${new Date(submittedAt).toLocaleString("en-GB")}`,
-    "",
-    "─── PARENT ──────────────────────────────────────────",
-    `Name             : ${data.parentFullName}`,
-    `Email            : ${data.email}`,
-    `Phone            : ${data.parentPhone}`,
-    `CFC History      : ${data.cfcAttendanceHistory}`,
-    "",
-    "─── CHILD(REN) ──────────────────────────────────────",
-    `Name(s)          : ${data.childrenFullNames}`,
-    `Age Group        : ${AGE_LABEL[data.childrenAges as CampAgeOption]}`,
-    `Child 1 Gender   : ${data.childOneGender}`,
-    ...(data.childTwoGender ? [`Child 2 Gender   : ${data.childTwoGender}`] : []),
-    `T-Shirt Size(s)  : ${data.tshirtSizes.join(", ")}`,
-    ...(data.nannyName ? [`Nanny            : ${data.nannyName} · ${data.nannyPhone ?? ""}`] : []),
-    `Emergency Contact: ${data.emergencyContact}`,
-    "",
-    "─── PROGRAMME ───────────────────────────────────────",
-    `Month(s)         : ${months}`,
-    `Duration         : ${weeks}`,
-    `Payment Option   : ${PAYMENT_OPTION_LABEL[data.paymentOption] ?? data.paymentOption}`,
-    `Estimated Fee    : ${feeLabel}`,
-    "",
-    "─── PROOF OF PAYMENT ────────────────────────────────",
-    sanityDocId ? `View in Studio   : ${STUDIO_URL}` : "Sanity disabled — proof not stored.",
-    "",
-    "ACTION REQUIRED: Review the proof of payment and update the registration status in Sanity.",
-  ].join("\n");
-
-  await notifyTeam({
-    subject: `New registration: ${data.parentFullName} · ${registrationId}`,
-    body: adminEmailBody,
-  });
+  await NotificationService.sendAdminNotification("new-registration", regData);
 
   // 8. Google Sheets sync (best-effort — never fails the registration)
   let sheetsSynced  = false;
