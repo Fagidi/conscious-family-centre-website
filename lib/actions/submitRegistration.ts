@@ -48,29 +48,47 @@ const PAYMENT_OPTION_LABEL: Record<string, string> = {
 
 // ── Registration ID ──────────────────────────────────────────────────────────
 
-function extractNameCodes(childrenFullNames: string): { first: string; last: string } {
-  const firstName = (childrenFullNames ?? "").split(",")[0].trim();
-  const parts = firstName.split(/\s+/).filter(Boolean);
-  const raw1 = (parts[0] ?? "").toUpperCase().replace(/[^A-Z]/g, "");
-  const raw2 = (parts[parts.length - 1] ?? "").toUpperCase().replace(/[^A-Z]/g, "");
-  return {
-    first: raw1.slice(0, 3).padEnd(3, "X"),
-    last:  (parts.length > 1 ? raw2 : "XXX").slice(0, 3).padEnd(3, "X"),
-  };
-}
+// Programme codes — extend here when new programmes are added
+type ProgrammeCode = "FMS" | "HUB" | "SPL" | "FST";
 
-async function buildRegistrationId(childrenFullNames: string): Promise<string> {
-  const { first, last } = extractNameCodes(childrenFullNames);
-  let seq = 1;
+/**
+ * Generates a unique public Registration ID in the format:
+ *   CFC-{PROGRAMME}-{YEAR}-{SEQ}
+ *   e.g. CFC-FMS-2026-0001
+ *
+ * Sequence is derived from the highest existing number for the same
+ * prefix so that numbers are never reused after a deletion.
+ * Falls back to a timestamp-based number if Sanity is unavailable.
+ */
+async function generateRegistrationId(
+  programme: ProgrammeCode = "FMS",
+  year: number = 2026,
+): Promise<string> {
+  const prefix = `CFC-${programme}-${year}`;
+  let nextSeq = 1;
+
   if (writeClient) {
     try {
-      const count = await writeClient.fetch<number>(`count(*[_type == "futureMakersRegistration"])`);
-      seq = (count ?? 0) + 1;
+      const existingIds = await writeClient.fetch<string[]>(
+        `*[_type == "futureMakersRegistration" && registrationId match $pattern].registrationId`,
+        { pattern: `${prefix}-*` },
+      );
+      if (existingIds && existingIds.length > 0) {
+        const maxSeq = Math.max(
+          0,
+          ...existingIds.map((id) => {
+            const seq = parseInt(id.split("-").at(-1) ?? "0", 10);
+            return isNaN(seq) ? 0 : seq;
+          }),
+        );
+        nextSeq = maxSeq + 1;
+      }
     } catch {
-      seq = Date.now() % 9000 + 1000;
+      nextSeq = (Date.now() % 9000) + 1000;
     }
   }
-  return `CFC-2026-${first}-${last}-${String(seq).padStart(4, "0")}`;
+
+  return `${prefix}-${String(nextSeq).padStart(4, "0")}`;
 }
 
 // ── Timeline helpers ─────────────────────────────────────────────────────────
@@ -149,7 +167,7 @@ export async function submitRegistration(formData: FormData): Promise<ActionResu
   const weeks     = WEEK_LABEL[data.selectedWeeks as CampWeeks];
 
   // 3. Generate Registration ID
-  const registrationId = await buildRegistrationId(data.childrenFullNames);
+  const registrationId = await generateRegistrationId("FMS", 2026);
 
   // 4+5. Upload proof + save registration document
   let sanityDocId: string | null = null;

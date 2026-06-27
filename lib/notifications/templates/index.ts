@@ -39,7 +39,7 @@ export interface SampleVars {
 export const SAMPLE: SampleVars = {
   parentName: "Amara Okafor",
   childName:  "Zara Okafor",
-  regId:      "CFC-2026-ZAR-OKA-0001",
+  regId:      "CFC-FMS-2026-0001",
   email:      "amara@example.com",
   programme:  "4 weeks · July & August",
   fee:        "₦180,000",
