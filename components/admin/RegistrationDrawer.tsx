@@ -284,45 +284,45 @@ export default function RegistrationDrawer({ registration: reg, onClose, onDelet
             </p>
           </Section>
 
-          {/* Delete — admin only */}
-          {role === "admin" && (
-            <Section title="Danger Zone">
-              {!confirmDelete ? (
-                <button
-                  onClick={() => setConfirm(true)}
-                  className="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  Delete Registration
-                </button>
-              ) : (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-3">
-                  <p className="text-sm font-medium text-red-700">This will permanently delete this registration. Are you sure?</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setConfirm(false)}
-                      disabled={isPending}
-                      className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleDelete}
-                      disabled={isPending}
-                      className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
-                    >
-                      {isPending ? "Deleting…" : "Yes, Delete"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </Section>
-          )}
-
           {/* Timeline */}
           <Section title="Activity Timeline">
             <AdminTimeline events={reg.timeline} />
           </Section>
         </div>
+
+        {/* Delete footer — admin only, always visible */}
+        {role === "admin" && (
+          <div className="border-t border-gray-200 bg-white px-6 py-4">
+            {!confirmDelete ? (
+              <button
+                onClick={() => setConfirm(true)}
+                className="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Delete Registration
+              </button>
+            ) : (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-3">
+                <p className="text-sm font-medium text-red-700">Permanently delete this registration. Are you sure?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setConfirm(false)}
+                    disabled={isPending}
+                    className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isPending}
+                    className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                  >
+                    {isPending ? "Deleting…" : "Yes, Delete"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Toast */}
         {toast && (
