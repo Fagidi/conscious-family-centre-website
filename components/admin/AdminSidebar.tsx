@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const NAV = [
-  { href: "/admin/dashboard",      label: "Dashboard",      icon: "▣" },
-  { href: "/admin/registrations",  label: "Registrations",  icon: "▤" },
-  { href: "/admin/payments",       label: "Payments",       icon: "₢" },
-  { href: "/admin/reports",        label: "Reports",        icon: "▦" },
-  { href: "/admin/settings",       label: "Settings",       icon: "◈" },
+  { href: "/admin/dashboard",      label: "Dashboard",      icon: "▣", adminOnly: false },
+  { href: "/admin/registrations",  label: "Registrations",  icon: "▤", adminOnly: false },
+  { href: "/admin/payments",       label: "Payments",       icon: "₢", adminOnly: false },
+  { href: "/admin/reports",        label: "Reports",        icon: "▦", adminOnly: false },
+  { href: "/admin/settings",       label: "Settings",       icon: "◈", adminOnly: true  },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ role }: { role: string }) {
   const pathname = usePathname();
   const router   = useRouter();
 
@@ -36,7 +36,7 @@ export default function AdminSidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
         <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/30">Menu</p>
-        {NAV.map(({ href, label, icon }) => {
+        {NAV.filter(item => !item.adminOnly || role === "admin").map(({ href, label, icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
