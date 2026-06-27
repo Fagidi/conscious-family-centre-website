@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { Registration, RegistrationStatus, PaymentStatus } from "@/lib/admin/types";
-import { updateRegistrationStatus, updatePaymentStatus, saveAdminNotes } from "@/lib/admin/actions";
+import { updateRegistrationStatus, updatePaymentStatus, saveAdminNotes, deleteRegistration } from "@/lib/admin/actions";
 import { RegistrationStatusBadge, PaymentStatusBadge } from "./StatusBadge";
 import AdminTimeline from "./AdminTimeline";
 
@@ -56,11 +56,14 @@ function Row({ label, value }: { label: string; value?: string | null }) {
 interface DrawerProps {
   registration: Registration | null;
   onClose: () => void;
+  onDeleted?: () => void;
+  role?: string;
 }
 
-export default function RegistrationDrawer({ registration: reg, onClose }: DrawerProps) {
-  const [notes,    setNotes]    = useState(reg?.adminNotes ?? "");
-  const [toast,    setToast]    = useState("");
+export default function RegistrationDrawer({ registration: reg, onClose, onDeleted, role }: DrawerProps) {
+  const [notes,       setNotes]      = useState(reg?.adminNotes ?? "");
+  const [toast,       setToast]      = useState("");
+  const [confirmDelete, setConfirm]  = useState(false);
   const [isPending, startTransition] = useTransition();
 
   if (!reg) return null;
@@ -81,6 +84,18 @@ export default function RegistrationDrawer({ registration: reg, onClose }: Drawe
     startTransition(async () => {
       const res = await updatePaymentStatus(reg!._id, paymentStatus);
       showToast(res.ok ? "Payment status updated." : `Error: ${res.error}`);
+    });
+  }
+
+  function handleDelete() {
+    startTransition(async () => {
+      const res = await deleteRegistration(reg!._id);
+      if (res.ok) {
+        onDeleted?.();
+      } else {
+        showToast(`Error: ${res.error}`);
+        setConfirm(false);
+      }
     });
   }
 
@@ -268,6 +283,40 @@ export default function RegistrationDrawer({ registration: reg, onClose }: Drawe
                 : "Not yet synced"}
             </p>
           </Section>
+
+          {/* Delete — admin only */}
+          {role === "admin" && (
+            <Section title="Danger Zone">
+              {!confirmDelete ? (
+                <button
+                  onClick={() => setConfirm(true)}
+                  className="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  Delete Registration
+                </button>
+              ) : (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-3">
+                  <p className="text-sm font-medium text-red-700">This will permanently delete this registration. Are you sure?</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setConfirm(false)}
+                      disabled={isPending}
+                      className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={isPending}
+                      className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                    >
+                      {isPending ? "Deleting…" : "Yes, Delete"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </Section>
+          )}
 
           {/* Timeline */}
           <Section title="Activity Timeline">

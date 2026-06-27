@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   useReactTable,
   getCoreRowModel,
@@ -70,7 +71,7 @@ const PAY_STATUS_OPTIONS: PaymentStatus[] = [
   "awaiting-review", "deposit-paid", "fully-paid", "payment-issue", "refunded",
 ];
 
-export default function RegistrationsTable({ data }: { data: Registration[] }) {
+export default function RegistrationsTable({ data, role }: { data: Registration[]; role?: string }) {
   const [search,          setSearch]  = useState("");
   const [statusFilter,    setStatus]  = useState<string>("");
   const [paymentFilter,   setPayment] = useState<string>("");
@@ -79,6 +80,7 @@ export default function RegistrationsTable({ data }: { data: Registration[] }) {
   const [columnFilters,   setColFilters] = useState<ColumnFiltersState>([]);
   const [pageSize,        setPageSize]   = useState(25);
   const [selectedReg,     setSelected]   = useState<Registration | null>(null);
+  const router = useRouter();
 
   const filtered = useMemo(() => {
     let rows = data;
@@ -283,6 +285,8 @@ export default function RegistrationsTable({ data }: { data: Registration[] }) {
         <RegistrationDrawer
           registration={selectedReg}
           onClose={() => setSelected(null)}
+          onDeleted={() => { setSelected(null); router.refresh(); }}
+          role={role}
         />
       )}
     </>

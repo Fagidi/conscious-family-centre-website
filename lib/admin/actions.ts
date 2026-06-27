@@ -69,6 +69,19 @@ export async function updatePaymentStatus(
   }
 }
 
+export async function deleteRegistration(
+  docId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!writeClient) return { ok: false, error: "Write client not configured." };
+  try {
+    await writeClient.delete(docId);
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
 export async function saveAdminNotes(
   docId: string,
   notes: string,

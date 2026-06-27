@@ -27,3 +27,5 @@ next-env.d.ts
 
 # netlify
 .netlify
+.vercel
+.env*
