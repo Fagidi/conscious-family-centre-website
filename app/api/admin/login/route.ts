@@ -11,8 +11,8 @@ interface User { email: string; hash: string; role: UserRole }
 
 function getUsers(): User[] {
   return [
-    { email: process.env.ADMIN_EMAIL ?? "",     hash: process.env.ADMIN_PASSWORD_HASH ?? "",     role: "admin" },
-    { email: process.env.SECRETARY_EMAIL ?? "",  hash: process.env.SECRETARY_PASSWORD_HASH ?? "",  role: "secretary" },
+    { email: process.env.ADMIN_EMAIL ?? "",     hash: process.env.ADMIN_PASSWORD_HASH ?? "",     role: "admin"     as const },
+    { email: process.env.SECRETARY_EMAIL ?? "",  hash: process.env.SECRETARY_PASSWORD_HASH ?? "",  role: "secretary" as const },
   ].filter(u => u.email && u.hash);
 }
 
