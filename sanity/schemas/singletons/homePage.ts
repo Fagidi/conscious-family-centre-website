@@ -11,7 +11,7 @@ const section = (name: string, title: string, fields: ReturnType<typeof defineFi
   defineField({ name, title, type: "object", options: { collapsible: true, collapsed: true }, fields });
 
 const eyebrow = defineField({ name: "eyebrow", title: "Section Label", type: "string", description: "Small text displayed above the heading" });
-const heading = defineField({ name: "heading", title: "Heading", type: "string", validation: (r) => r.required() });
+const heading = defineField({ name: "heading", title: "Heading", type: "string" });
 const intro = defineField({ name: "intro", title: "Introduction Text", type: "text", rows: 2 });
 
 export const homePage = defineType({
@@ -51,7 +51,7 @@ export const homePage = defineType({
             preview: { select: { title: "title" } },
           }),
         ],
-        validation: (r) => r.min(3).max(4),
+        validation: (r) => r.max(4),
       }),
     ]),
     section("about", "About Preview", [

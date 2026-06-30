@@ -11,7 +11,7 @@ const section = (name: string, title: string, fields: ReturnType<typeof defineFi
   defineField({ name, title, type: "object", options: { collapsible: true, collapsed: true }, fields });
 
 const eyebrow = defineField({ name: "eyebrow", title: "Section Label", type: "string", description: "Small text displayed above the heading" });
-const heading = defineField({ name: "heading", title: "Heading", type: "string", validation: (r) => r.required() });
+const heading = defineField({ name: "heading", title: "Heading", type: "string" });
 const intro = defineField({ name: "intro", title: "Introduction Text", type: "text", rows: 2 });
 
 const cardArray = (name: string) =>
@@ -30,7 +30,7 @@ const cardArray = (name: string) =>
         preview: { select: { title: "title" } },
       }),
     ],
-    validation: (r) => r.min(3).max(6),
+    validation: (r) => r.max(6),
   });
 
 export const aboutPage = defineType({
@@ -61,7 +61,7 @@ export const aboutPage = defineType({
       eyebrow,
       heading,
       intro,
-      defineField({ name: "images", title: "Photos", type: "array", of: [{ type: "imageWithAlt" }], validation: (r) => r.min(3).max(8) }),
+      defineField({ name: "images", title: "Photos", type: "array", of: [{ type: "imageWithAlt" }], validation: (r) => r.max(8) }),
     ]),
     section("team", "Meet the Team", [eyebrow, heading, intro]),
     section("testimonials", "Parent Testimonials", [eyebrow, heading]),
