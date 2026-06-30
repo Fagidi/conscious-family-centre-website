@@ -29,7 +29,6 @@ export const seo = defineType({
       title: "Page Description (for search results)",
       type: "text",
       rows: 2,
-      validation: (r) => r.max(160),
     }),
     defineField({ name: "ogImage", title: "Social Media Preview Image", type: "image" }),
     defineField({
